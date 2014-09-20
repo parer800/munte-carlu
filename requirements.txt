@@ -1,2 +1,9 @@
+OpenGLContext==2.2.0a3
+Pillow==2.5.3
+PyDispatcher==2.0.3
 PyOpenGL==3.1.0
 PyOpenGL-accelerate==3.1.0
+PyVRML97==2.3.0a4
+SimpleParse==2.1.1
+numpy==1.9.0
+wsgiref==0.1.2
