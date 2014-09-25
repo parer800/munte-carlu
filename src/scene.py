@@ -26,4 +26,3 @@ class Scene():
 
 		# Append all geometry objects.
 		self.sceneGeometry.append(sphere)
-		print 'tjenare'
