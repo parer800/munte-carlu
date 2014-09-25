@@ -2,6 +2,8 @@
 
 import numpy as np
 
+
+
 class Material(object):
 	"""A class for material attributes
 	color: 			material's color
@@ -14,16 +16,19 @@ class Material(object):
 
 	#constructor
 	def __init__(self):
-		print "Inside Material init"
 		self.color = np.array([.0,.0,.0])
 
 	#================================================================
 	#========================== SETTERS =============================
 	#================================================================
 
-	#Set color
+	#Set color with an array
 	def setColor(self, color=np.array([.0,.0,.0])):
 		self.color = color
+
+	#Set color with rgb
+	def setColor(self, r, g, b):
+		self.color = np.array([r, g, b])
 
 	#Set Specular color
 	def setSpecularColor(self, specularColor = np.array([.0,.0,.0])):
@@ -73,3 +78,6 @@ class Material(object):
 	#Get IOR
 	def getIOR(self):
 		return self.IOR
+
+
+

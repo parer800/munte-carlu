@@ -3,14 +3,16 @@
 import numpy as np
 
 from material import Material
+from ray import Ray
+
+
 
 class Geometry(Material):
-	"""A base class for geometry"""
+    """A base class for geometry"""
 
-	#constructor
-	def __init__(self):
-		print "Inside Geometry init"
-		super(Material, self).__init__()
+    #constructor
+    def __init__(self):
+        super(Material, self).__init__()
 
-
-
+    def intersect(r):
+        pass
