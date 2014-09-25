@@ -21,11 +21,11 @@ class Render():
 	def init(self):
 		self.Tracer.init() # Init Tracer
 		pixelData = [0] * (self.width * self.height)
-
+		
 		for y in range(0, self.height):
 			for x in range(0, self.width):
 				pixelData[x + (y * self.height)] = self.createPixel(x, y)
-
+		
 		self.pixelData = pixelData
 
 	# Render a single pixel
