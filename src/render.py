@@ -19,9 +19,9 @@ class Render():
 
 	# Init Renderer
 	def init(self):
-		self.Tracer.init()
-
+		self.Tracer.init() # Init Tracer
 		pixelData = [0] * (self.width * self.height)
+
 		for y in range(0, self.height):
 			for x in range(0, self.width):
 				pixelData[x + (y * self.height)] = self.createPixel(x, y)
@@ -30,7 +30,12 @@ class Render():
 
 	# Render a single pixel
 	def createPixel(self, x, y):
-		return self.Tracer.castRay()
+
+		# IMPLEMENT ANTI-ALIASING HERE, MULTIPLE RAYS PER PIXEL
+		offsetX = 0.5
+		offsetY = 0.5
+
+		return self.Tracer.traceRay(x + offsetX, y + offsetY)
 
 	# Draw Renderer
 	def draw(self):

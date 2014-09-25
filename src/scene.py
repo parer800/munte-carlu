@@ -11,14 +11,14 @@ from sphere import *
 class Scene():
 
 	# Constructor Scene
-	def __init__(self, imageWidth, imageHeight, cameraPos, fieldOfView, viewDirection = np.array([0.0, 0.0, -1.0])):
-		self.imageWidth = imageWidth # Image plane width.
-		self.imageHeight = imageHeight # Image plane height.
+	def __init__(self,  cameraPos, fovY, aspect, viewDirection = np.array([0.0, 0.0, -1.0])):
 		self.cameraPos = cameraPos # Global camera position.
-		self.fieldOfView = fieldOfView # Field of View for camera to view plane.
+		self.fovY = fovY # Field of View for the Y-component.
+		self.aspect = aspect # Aspect of x / y
 		self.viewDirection = viewDirection # View direction of camera.
 		self.sceneGeometry = [] # Contains all geometry in the scene, Cornell Box.
 
+		# Setup scene geometry.
 	def setupScene(self):
 
 		# Create all geometry objects.
@@ -26,4 +26,4 @@ class Scene():
 
 		# Append all geometry objects.
 		self.sceneGeometry.append(sphere)
-		print 'tjenare'
+		

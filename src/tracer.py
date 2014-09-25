@@ -14,14 +14,19 @@ class Tracer():
 	def __init__(self, width, height):
 		self.width = width
 		self.height = height
-		self.Scene = Scene(width, height, np.array([50.0, 50.0, 150.0]), 45.0)
+		self.Scene = Scene(np.array([50.0, 50.0, 150.0]), 45.0, (width / height))
 
 	# Init Tracer
 	def init(self):
 		self.Scene.setupScene()
 
 
-	def castRay(self):
+	def traceRay(self, pixelPosX, pixelPosY):
+
+		rayPosX = self.Scene.cameraPos[0]
+		#rayPosY = 
+		#rayPosZ = 
+
 		R = np.random.random()
 		G = np.random.random()
 		B = np.random.random()
