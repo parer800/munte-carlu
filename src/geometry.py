@@ -14,5 +14,11 @@ class Geometry(Material):
     def __init__(self):
         super(Material, self).__init__()
 
+    def setPosition(self, x, y, z):
+        self.position(np.array([x,y,z]))
+
+    def getPosition(self):
+        return self.position
+
     def intersect(r):
         pass
