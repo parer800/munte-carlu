@@ -6,7 +6,7 @@ import numpy as np
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
-
+from tracer import *
 
 class Render():
 
@@ -15,18 +15,22 @@ class Render():
 		self.pixelData = None
 		self.width = width
 		self.height = height
+		self.Tracer = Tracer(width, height)
 
 	# Init Renderer
 	def init(self):
+		self.Tracer.init()
+
 		pixelData = [0] * (self.width * self.height)
 		for y in range(0, self.height):
 			for x in range(0, self.width):
-				R = np.random.random()
-				G = np.random.random()
-				B = np.random.random()
-				A = np.random.random()
-				pixelData[x + (y * self.height)] = [R, G, B, A]
+				pixelData[x + (y * self.height)] = self.createPixel(x, y)
+
 		self.pixelData = pixelData
+
+	# Render a single pixel
+	def createPixel(self, x, y):
+		return self.Tracer.castRay()
 
 	# Draw Renderer
 	def draw(self):
