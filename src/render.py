@@ -24,7 +24,7 @@ class Render():
 		
 		for y in range(0, self.height):
 			for x in range(0, self.width):
-				pixelData[x + (y * self.height)] = self.createPixel(x, y)
+				pixelData[x + (y * self.width)] = self.createPixel(x, y)
 		
 		self.pixelData = pixelData
 
