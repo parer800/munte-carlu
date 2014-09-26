@@ -3,8 +3,9 @@
 import numpy as np
 
 
-from geometry import Geometry
-from ray import Ray
+from geometry import *
+from ray import *
+from material import *
 
 class Sphere(Geometry):
     """A class for sphere objects
@@ -12,8 +13,8 @@ class Sphere(Geometry):
     """
 
     #constructor
-    def __init__(self, radius=1):
-        super(Geometry, self).__init__()
+    def __init__(self, material=Material(), radius=1):
+        super(Geometry, self).__init__(material)
         self.radius = radius
 
 
@@ -39,7 +40,7 @@ class Sphere(Geometry):
     #================================================================
 
     #Intersect sphere
-    def intersect(r):
+    def intersect(self, r):
         if isinstance(r, Ray) is True:
             #Check if ray really intersect with the sphere, i.e. has 2 insection points. Otherwise do not calculate the roots.
             #Ray : P = P0 + t*V

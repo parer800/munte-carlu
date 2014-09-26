@@ -3,6 +3,7 @@
 #tracer.py, Class for the actual Ray Tracer
 
 import numpy as np
+import random as rand
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -34,11 +35,24 @@ class Tracer():
 		rayDirection = rayDirection / np.linalg.norm(rayDirection)
 
 		# Spawn new ray
-		singleRay = Ray(rayDirection, rayOrigin)
+		ray = Ray(rayDirection, rayOrigin)
 
-		# Return pixel colors
-		R = np.random.random()
-		G = np.random.random()
-		B = np.random.random()
-		A = np.random.random()
-		return [R, G, B, A]
+		# Russian Roulette random variable
+		rr = rand.random()
+
+		# Pixel Color
+		pixelColor = [0.0, 0.0, 0.0, 0.0]
+		
+		# Go through all geometry in the scene
+		geometry = self.Scene.sceneGeometry
+		for g in range(len(geometry)):
+			matColor = geometry[g].Material.getColor()
+			if geometry[g].intersect(ray) is True:
+				pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
+
+		return pixelColor
+
+		
+
+
+		
