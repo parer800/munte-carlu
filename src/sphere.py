@@ -1,10 +1,14 @@
     #Sphere.py
 
 import numpy as np
+
 from numpy import linalg as LA
 from numpy import multiply as vecMult
+
 from geometry import Geometry
 from ray import Ray
+from material import Material
+
 
 class Sphere(Geometry):
     """A class for sphere objects
@@ -12,8 +16,8 @@ class Sphere(Geometry):
     """
 
     #constructor
-    def __init__(self, radius=1):
-        super(Geometry, self).__init__()
+    def __init__(self, material=Material(), radius=1):
+        super(Geometry, self).__init__(material)
         self.radius = radius
 
 
@@ -53,6 +57,7 @@ class Sphere(Geometry):
         :param r: Ray object which includes an origin point and a direction
         :return: False when ray has no intersection or tangent to the sphere, Returns intersection point as np.array if there is an intersection
         """
+
         if isinstance(r, Ray) is True:
             #Check if ray really intersect with the sphere, i.e. has 2 insection points. Otherwise do not calculate the roots.
             #Ray : P = P0 + t*V
