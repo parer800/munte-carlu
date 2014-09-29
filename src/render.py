@@ -3,6 +3,8 @@
 #render.py, Class for rendering
 
 import numpy as np
+import time
+import sys
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -21,11 +23,23 @@ class Render():
 	def init(self):
 		self.Tracer.init() # Init Tracer
 		pixelData = [0] * (self.width * self.height)
+		height = self.height
+		width = self.width
+		createPixel = self.createPixel
 		
-		for y in range(0, self.height):
-			for x in range(0, self.width):
-				pixelData[x + (y * self.width)] = self.createPixel(x, y)
+		sys.stdout.write("[%s]" % (" " * 100))
+		sys.stdout.flush()
+		sys.stdout.write("\b" * (100 + 1))
+
+		for y in range(0, height):
+			for x in range(0, width):
+				pixelData[x + (y * width)] = createPixel(x, y)
+
+			if y%(height/100) == 0:
+				sys.stdout.write("-")
+				sys.stdout.flush()
 		
+		sys.stdout.write("\n")
 		self.pixelData = pixelData
 
 	# Render a single pixel
@@ -37,7 +51,9 @@ class Render():
 
 		return self.Tracer.traceRay(x + offsetX, y + offsetY)
 
+		
+
 	# Draw Renderer
 	def draw(self):
-		glRasterPos2i(-1 , -1)
+		#glRasterPos2i(-1 , -1)
 		glDrawPixels(self.width , self.height , GL_RGBA , GL_FLOAT , self.pixelData)

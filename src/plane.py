@@ -11,12 +11,8 @@ from material import *
 class Plane(Geometry):
 
 	# Constructor
-    def __init__(self, material=Material(), normalX=0.0, normalY=0.0, normalZ=1.0, width=50.0, height=50.0):
+    def __init__(self, material=Material()):
         super(Plane, self).__init__(material)
-        self.normal = np.array([normalX, normalY, normalZ])
-        self.width = width
-        self.height = height
-
 
     #================================================================
     #========================== SETTERS =============================
@@ -25,13 +21,20 @@ class Plane(Geometry):
     def setNormal(self, normalX, normalY, normalZ):
     	self.normal = np.array([normalX, normalY, normalZ])
 
-    def setWidth(self, width):
-    	self.width = width
+    def setPointSouthWest(self, x, y, z):
+    	self.pointSouthWest = np.array([x, y, z])
+        self.setPosition(x, y, z)
 
-    def setHeight(self, height):
-    	self.height = height
+    def setPointNorthWest(self, x, y, z):
+        self.pointNorthWest = np.array([x, y, z])
 
-    def setPosition(self, x, y, z):
+    def setPointNorthEast(self, x, y, z):
+        self.pointNorthEast = np.array([x, y, z])
+
+    def setPointSouthEast(self, x, y, z):
+        self.pointSouthEast = np.array([x, y, z])
+
+    def __setPosition(self, x, y, z):
     	super(Plane, self).setPosition(x, y, z)
 
 
@@ -57,14 +60,24 @@ class Plane(Geometry):
     def intersect(self, r):
         if isinstance(r, Ray) is True:
 
+            EPSILON = 0.000001
             denom = np.dot(self.normal, r.direction)
 
-            if denom != 0:
+            if denom < -EPSILON:
                 originToCenter = self.position - r.origin
                 t = np.dot(originToCenter, self.normal) / denom
-                if t >= 0:
-                    return True
+                if t > 0:
+                    #return t
+                    
+                    p = r.origin + r.direction * t                   
+                    vec1 = self.pointNorthWest - self.pointSouthWest
+                    vec2 = self.pointSouthEast - self.pointSouthWest
+                    x = np.dot((p - self.pointSouthWest), vec1) / np.dot(vec1, vec1)
+                    y = np.dot((p - self.pointSouthWest), vec2) / np.dot(vec2, vec2)
 
-        	return False
+                    if 0.0 <= x <= 1.0 and 0.0 <= y <= 1.0: 
+                        return t
+                    
+        	return 0
 
 
