@@ -20,5 +20,8 @@ class Geometry(Material):
     def getPosition(self):
         return self.position
 
+    def getNormal(self, surfacePoint):
+        pass
+
     def intersect(self, r):
         pass

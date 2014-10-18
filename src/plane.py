@@ -42,7 +42,7 @@ class Plane(Geometry):
     #========================== GETTERS =============================
     #================================================================
 
-    def getNormal(self):
+    def getNormal(self, surfacePoint):
     	return self.normal
 
     def getWidth(self):

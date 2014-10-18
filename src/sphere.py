@@ -45,6 +45,15 @@ class Sphere(Geometry):
     def getCenterPoint(self):
         return self.centerPoint
 
+    #Get surface normal in point
+    def getNormal(self, surfacePoint):
+        direction = np.subtract(surfacePoint, self.centerPoint)
+        # u = u/||u||
+        directionNorm = 1/LA.norm(direction)
+        normal = np.multiply(direction, directionNorm)
+        return normal
+
+
 
     #================================================================
     #========================= VIRTUALS (Override) ==================
