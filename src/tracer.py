@@ -11,12 +11,11 @@ from scene import *
 from ray import *
 
 class Tracer():
-
         # Constructor Tracer
         def __init__(self, width, height):
             self.width = width
             self.height = height
-            self.Scene = Scene(np.array([50.0, 50.0, 189.0]), 45.0, (width / height))
+            self.Scene = Scene(np.array([75.0, 50.0, 250.0]), 45.0, (width / height))
 
         # Init Tracer
         def init(self):
