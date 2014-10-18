@@ -138,10 +138,10 @@ class Scene():
 
 		# Box Face Up
 		boxFaceUp = Plane(materialBox1)
-		boxFaceUp.setPointSouthWest(5.0, 30.0, 50.0)
-		boxFaceUp.setPointNorthWest(35.0, 30.0, 20.0)
-		boxFaceUp.setPointNorthEast(65.0, 30.0, 50.0)
-		boxFaceUp.setPointSouthEast(35.0, 30.0, 80.0)
+		boxFaceUp.setPointSouthWest(5.0, 40.0, 50.0)
+		boxFaceUp.setPointNorthWest(35.0, 40.0, 20.0)
+		boxFaceUp.setPointNorthEast(65.0, 40.0, 50.0)
+		boxFaceUp.setPointSouthEast(35.0, 40.0, 80.0)
 		boxFaceUp.setNormal(0.0, 1.0, 0.0)
 
 		# Box Face Down
@@ -155,32 +155,32 @@ class Scene():
 		# Box Face Right
 		boxFaceRight = Plane(materialBox1)
 		boxFaceRight.setPointSouthWest(65.0, 0.1, 50.0)
-		boxFaceRight.setPointNorthWest(65.0, 30.0, 50.0)
-		boxFaceRight.setPointNorthEast(35.0, 30.0, 20.0)
+		boxFaceRight.setPointNorthWest(65.0, 40.0, 50.0)
+		boxFaceRight.setPointNorthEast(35.0, 40.0, 20.0)
 		boxFaceRight.setPointSouthEast(35.0, 0.1, 20.0)
 		boxFaceRight.setNormal((1/np.sqrt(2)), 0.0, -(1/np.sqrt(2)))
 
 		# Box Face Left
 		boxFaceLeft = Plane(materialBox2)
 		boxFaceLeft.setPointSouthWest(5.0, 0.1, 50.0)
-		boxFaceLeft.setPointNorthWest(5.0, 30.0, 50.0)
-		boxFaceLeft.setPointNorthEast(35.0, 30.0, 80.0)
+		boxFaceLeft.setPointNorthWest(5.0, 40.0, 50.0)
+		boxFaceLeft.setPointNorthEast(35.0, 40.0, 80.0)
 		boxFaceLeft.setPointSouthEast(35.0, 0.1, 80.0)
 		boxFaceLeft.setNormal(-(1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
 		
 		# Box Face Back
 		boxFaceBack = Plane(materialBox1)
 		boxFaceBack.setPointSouthWest(35.0, 0.1, 20.0)
-		boxFaceBack.setPointNorthWest(35.0, 30.0, 20.0)
-		boxFaceBack.setPointNorthEast(5.0, 30.0, 50.0)
+		boxFaceBack.setPointNorthWest(35.0, 40.0, 20.0)
+		boxFaceBack.setPointNorthEast(5.0, 40.0, 50.0)
 		boxFaceBack.setPointSouthEast(5.0, 0.1, 50.0)
 		boxFaceBack.setNormal(-(1/np.sqrt(2)), 0.0, -(1/np.sqrt(2)))
 
 		# Box Face Front
 		boxFaceFront = Plane(materialBox3)
 		boxFaceFront.setPointSouthWest(35.0, 0.1, 80.0)
-		boxFaceFront.setPointNorthWest(35.0, 30.0, 80.0)
-		boxFaceFront.setPointNorthEast(65.0, 30.0, 50.0)
+		boxFaceFront.setPointNorthWest(35.0, 40.0, 80.0)
+		boxFaceFront.setPointNorthEast(65.0, 40.0, 50.0)
 		boxFaceFront.setPointSouthEast(65.0, 0.1, 50.0)
 		boxFaceFront.setNormal((1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
 		

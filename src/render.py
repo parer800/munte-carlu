@@ -6,6 +6,7 @@ import numpy as np
 import time
 import sys
 
+from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from tracer import *
@@ -26,6 +27,10 @@ class Render():
 		height = self.height
 		width = self.width
 		createPixel = self.createPixel
+
+		# Creating image to store values in
+		img = Image.new( 'RGBA', (width,height), "black")
+		imgPixels = img.load()
 		
 		sys.stdout.write("[%s]" % (" " * 100))
 		sys.stdout.flush()
@@ -33,13 +38,18 @@ class Render():
 
 		for y in range(0, height):
 			for x in range(0, width):
-				pixelData[x + (y * width)] = createPixel(x, y)
+				pix = createPixel(x, y)
+				imgPixels[x, height-y-1] = (int(pix[0]*255), int(pix[1]*255), int(pix[2]*255), int(pix[3]*255))
+				pixelData[x + (y * width)] = pix
 
 			if y%(height/100) == 0:
 				sys.stdout.write("-")
 				sys.stdout.flush()
 		
 		sys.stdout.write("\n")
+
+		#img.save('../out.png')
+		img.save('../Cornell_Box_' + str(width) + 'x' + str(height) + '.png')
 		self.pixelData = pixelData
 
 	# Render a single pixel
