@@ -10,6 +10,9 @@ from sphere import *
 from plane import *
 from material import *
 from diffuse import *
+from transparent import *
+from opaque import *
+from light import *
 
 class Scene():
 
@@ -42,178 +45,140 @@ class Scene():
         '''
 
         # CREATE ALL MATERIAL
-        materialDiffuseRed = Diffuse()
-        materialDiffuseRed.setColor(0.3, 0.3, 0.3)
+        materialRoof = Diffuse()
+        materialRoof.setColor(0.8, 0.8, 0.8)
 
-        materialDiffuseBlue = Material()
-        materialDiffuseBlue.setColor(0.4, 0.4, 0.4)
+        materialFloor = Diffuse()
+        materialFloor.setColor(0.8, 0.8, 0.8)
 
-        materialWhite = Material()
-        materialWhite.setColor(1.0, 1.0, 1.0)
+        materialWallBack = Diffuse()
+        materialWallBack.setColor(0.8, 0.8, 0.8)
 
-        materialGrey = Material()
-        materialGrey.setColor(0.6, 0.6, 0.6)
+        materialWallLeft = Diffuse()
+        materialWallLeft.setColor(0.6, 0.0, 0.0)
 
-        materialBlack = Material()
-        materialBlack.setColor(0.2, 0.2, 0.2)
+        materialWallRight = Diffuse()
+        materialWallRight.setColor(0.0, 0.6, 0.0)
 
-        materialGreen = Material()
-        materialGreen.setColor(0.7, 0.7, 0.7)
+        materialBox = Diffuse()
+        materialBox.setColor(0.5, 0.5, 0.5)
 
-        materialSphere1 = Material()
-        materialSphere1.setColor(0.3, 1.0, 0.3)
+        materialGlassSphere = Transparent()
+        materialGlassSphere.setColor(0.2, 0.2, 0.8)
 
-        materialSphere2 = Material()
-        materialSphere2.setColor(0.1, 0.5, 0.8)
+        materialPlasticSphere = Opaque()
+        materialPlasticSphere.setColor(0.8, 0.2, 0.2)
 
-        materialBox1 = Material()
-        materialBox1.setColor(0.8, 0.1, 0.3)
-
-        materialBox2 = Material()
-        materialBox2.setColor(0.7, 0.1, 0.2)
-
-        materialBox3 = Material()
-        materialBox3.setColor(0.6, 0.0, 0.3)
+        materialLight = Light()
 
 
         # CREATE ALL GEOMETRY
 
         # Wall Back
-        planeBack = Plane(materialGrey)
+        planeBack = Plane(materialWallBack)
         planeBack.setPointSouthWest(0.0, 0.0, 0.0)
         planeBack.setPointNorthWest(0.0, 100.0, 0.0)
         planeBack.setPointNorthEast(150.0, 100.0, 0.0)
         planeBack.setPointSouthEast(150.0, 0.0, 0.0)
         planeBack.setNormal(0.0, 0.0, 1.0)
-        planeBack.Material.setReflection(0.2)
-        planeBack.Material.setRefraction(0.0)
 
         # Wall Left
-        planeLeft = Plane(materialDiffuseRed)
+        planeLeft = Plane(materialWallLeft)
         planeLeft.setPointSouthWest(0.0, 0.0, 120.0)
         planeLeft.setPointNorthWest(0.0, 100.0, 120.0)
         planeLeft.setPointNorthEast(0.0, 100.0, 0.0)
         planeLeft.setPointSouthEast(0.0, 0.0, 0.0)
         planeLeft.setNormal(1.0, 0.0, 0.0)
-        planeLeft.Material.setReflection(0.2)
-        planeLeft.Material.setRefraction(0.0)
 
         # Wall Right
-        planeRight = Plane(materialDiffuseBlue)
+        planeRight = Plane(materialWallRight)
         planeRight.setPointSouthWest(150.0, 0.0, 0.0)
         planeRight.setPointNorthWest(150.0, 100.0, 0.0)
         planeRight.setPointNorthEast(150.0, 100.0, 120.0)
         planeRight.setPointSouthEast(150.0, 0.0, 120.0)
         planeRight.setNormal(-1.0, 0.0, 0.0)
-        planeRight.Material.setReflection(0.2)
-        planeRight.Material.setRefraction(0.0)
-
 
         # Roof
-        planeUp = Plane(materialBlack)
+        planeUp = Plane(materialRoof)
         planeUp.setPointSouthWest(0.0, 100.0, 120.0)
         planeUp.setPointNorthWest(150.0, 100.0, 120.0)
         planeUp.setPointNorthEast(150.0, 100.0, 0.0)
         planeUp.setPointSouthEast(0.0, 100.0, 0.0)
         planeUp.setNormal(0.0, -1.0, 0.0)
-        planeUp.Material.setReflection(0.2)
-        planeUp.Material.setRefraction(0.0)
 
         # Floor
-        planeDown = Plane(materialGreen)
+        planeDown = Plane(materialFloor)
         planeDown.setPointSouthWest(0.0, 0.0, 0.0)
         planeDown.setPointNorthWest(150.0, 0.0, 0.0)
         planeDown.setPointNorthEast(150.0, 0.0, 120.0)
         planeDown.setPointSouthEast(0.0, 0.0, 120.0)
         planeDown.setNormal(0.0, 1.0, 0.0)
-        planeDown.Material.setReflection(0.2)
-        planeDown.Material.setRefraction(0.0)
 
         # Light Source
-        areaLightSource = Plane(materialWhite)
+        areaLightSource = Plane(materialLight)
         areaLightSource.setPointSouthWest(25.0, 99.0, 80.0)
         areaLightSource.setPointNorthWest(65.0, 99.0, 80.0)
         areaLightSource.setPointNorthEast(65.0, 99.0, 60.0)
         areaLightSource.setPointSouthEast(25.0, 99.0, 60.0)
         areaLightSource.setNormal(0.0, -1.0, 0.0)
-        areaLightSource.Material.setReflection(-1)
-        areaLightSource.Material.setRefraction(0.0)
 
-        # Sphere 1 Opaque
-        sphere1 = Sphere(materialSphere1)
+        # Sphere Front Transparent
+        sphere1 = Sphere(materialGlassSphere)
         sphere1.setRadius(15.0)
         sphere1.setCenterPoint(np.array([100.0, 20.0, 80.0]))
-        sphere1.Material.setReflection(1.0)
-        sphere1.Material.setRefraction(0.0)
 
-        # Sphere 2 Transparent
-        sphere2 = Sphere(materialSphere2)
+        # Sphere Back Opaque
+        sphere2 = Sphere(materialPlasticSphere)
         sphere2.setRadius(20.0)
         sphere2.setCenterPoint(np.array([120.0, 40.0, 30.0]))
-        sphere2.Material.setReflection(1.0)
-        sphere2.Material.setRefraction(1.0)
 
         # Box Face Up
-        boxFaceUp = Plane(materialBox1)
+        boxFaceUp = Plane(materialBox)
         boxFaceUp.setPointSouthWest(5.0, 40.0, 50.0)
         boxFaceUp.setPointNorthWest(35.0, 40.0, 20.0)
         boxFaceUp.setPointNorthEast(65.0, 40.0, 50.0)
         boxFaceUp.setPointSouthEast(35.0, 40.0, 80.0)
         boxFaceUp.setNormal(0.0, 1.0, 0.0)
-        boxFaceUp.Material.setReflection(0.2)
-        boxFaceUp.Material.setRefraction(0.0)
 
         # Box Face Down
-        boxFaceDown = Plane(materialBox1)
+        boxFaceDown = Plane(materialBox)
         boxFaceDown.setPointNorthWest(5.0, 0.1, 50.0)
         boxFaceDown.setPointSouthWest(35.0, 0.1, 20.0)
         boxFaceDown.setPointSouthEast(65.0, 0.1, 50.0)
         boxFaceDown.setPointNorthEast(35.0, 0.1, 80.0)
         boxFaceDown.setNormal(0.0, -1.0, 0.0)
-        boxFaceDown.Material.setReflection(0.2)
-        boxFaceDown.Material.setRefraction(0.0)
 
         # Box Face Right
-        boxFaceRight = Plane(materialBox1)
+        boxFaceRight = Plane(materialBox)
         boxFaceRight.setPointSouthWest(65.0, 0.1, 50.0)
         boxFaceRight.setPointNorthWest(65.0, 40.0, 50.0)
         boxFaceRight.setPointNorthEast(35.0, 40.0, 20.0)
         boxFaceRight.setPointSouthEast(35.0, 0.1, 20.0)
         boxFaceRight.setNormal((1/np.sqrt(2)), 0.0, -(1/np.sqrt(2)))
-        boxFaceRight.Material.setReflection(0.2)
-        boxFaceRight.Material.setRefraction(0.0)
 
         # Box Face Left
-        boxFaceLeft = Plane(materialBox2)
+        boxFaceLeft = Plane(materialBox)
         boxFaceLeft.setPointSouthWest(5.0, 0.1, 50.0)
         boxFaceLeft.setPointNorthWest(5.0, 40.0, 50.0)
         boxFaceLeft.setPointNorthEast(35.0, 40.0, 80.0)
         boxFaceLeft.setPointSouthEast(35.0, 0.1, 80.0)
         boxFaceLeft.setNormal(-(1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
-        boxFaceLeft.Material.setReflection(0.2)
-        boxFaceLeft.Material.setRefraction(0.0)
 
         # Box Face Back
-        boxFaceBack = Plane(materialBox1)
+        boxFaceBack = Plane(materialBox)
         boxFaceBack.setPointSouthWest(35.0, 0.1, 20.0)
         boxFaceBack.setPointNorthWest(35.0, 40.0, 20.0)
         boxFaceBack.setPointNorthEast(5.0, 40.0, 50.0)
         boxFaceBack.setPointSouthEast(5.0, 0.1, 50.0)
         boxFaceBack.setNormal(-(1/np.sqrt(2)), 0.0, -(1/np.sqrt(2)))
-        boxFaceBack.Material.setReflection(0.2)
-        boxFaceBack.Material.setRefraction(0.0)
 
         # Box Face Front
-        boxFaceFront = Plane(materialBox3)
+        boxFaceFront = Plane(materialBox)
         boxFaceFront.setPointSouthWest(35.0, 0.1, 80.0)
         boxFaceFront.setPointNorthWest(35.0, 40.0, 80.0)
         boxFaceFront.setPointNorthEast(65.0, 40.0, 50.0)
         boxFaceFront.setPointSouthEast(65.0, 0.1, 50.0)
         boxFaceFront.setNormal((1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
-        boxFaceFront.Material.setReflection(0.2)
-        boxFaceFront.Material.setRefraction(0.0)
-
-
 
         # Append all geometry objects.
         self.sceneGeometry.append(planeBack)
