@@ -56,4 +56,4 @@ target/
 # Pycharm shit
 */.idea/
 
-.png
+*.png
