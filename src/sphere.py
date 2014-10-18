@@ -17,7 +17,7 @@ class Sphere(Geometry):
 
     #constructor
     def __init__(self, material=Material(), radius=1):
-        super(Geometry, self).__init__(material)
+        super(Sphere, self).__init__(material)
         self.radius = radius
 
 
@@ -72,14 +72,16 @@ class Sphere(Geometry):
 
             if underSqrt < 0:
                 # No intersection, will not be any real roots
-                return False
+                return 0.0
             elif underSqrt == 0:
                 # One intersection (tangent), only one solution but is neglected in this case
-                return False
+                return 0.0
             else:
                 #Intersection with sphere!
                 squareroot = underSqrt**0.5
                 #We only want to know the intersection point closest to the camera; so select the lowest solution
                 t = -(b/2)/a - squareroot
-                intersection = t*vecMult(t, r.direction)
-                return intersection
+                
+                #intersection = t*vecMult(t, r.direction)
+                #return intersection
+                return t

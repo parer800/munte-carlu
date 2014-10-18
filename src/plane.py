@@ -78,6 +78,6 @@ class Plane(Geometry):
                     if 0.0 <= x <= 1.0 and 0.0 <= y <= 1.0: 
                         return t
                     
-        	return 0
+        	return 0.0
 
 
