@@ -16,7 +16,8 @@ class Tracer():
 	def __init__(self, width, height):
 		self.width = width
 		self.height = height
-		self.Scene = Scene(np.array([50.0, 50.0, 189.0]), 45.0, (width / height))
+		#self.Scene = Scene(np.array([75.0, 50.0, 189.0]), 45.0, (width / height))
+		self.Scene = Scene(np.array([75.0, 50.0, 250.0]), 45.0, (width / height))
 
 	# Init Tracer
 	def init(self):
@@ -53,7 +54,7 @@ class Tracer():
 			t = geometry[g].intersect(ray)
 			if t > 0 and t < tClose:
 				tClose = t
-				pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
+				pixelColor = [matColor[0], matColor[1], matColor[2], 1.0]
 
 
 

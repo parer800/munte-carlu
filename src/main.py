@@ -6,8 +6,10 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from render import *
 
-WINDOW_WIDTH = 300
-WINDOW_HEIGHT = 200
+WINDOW_WIDTH = 600
+WINDOW_HEIGHT = 400
+#WINDOW_WIDTH = 1500
+#WINDOW_HEIGHT = 1000
 Renderer = Render(WINDOW_WIDTH, WINDOW_HEIGHT)
 
 # Init Main
