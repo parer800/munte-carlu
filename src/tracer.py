@@ -4,6 +4,8 @@
 
 import numpy as np
 import random as rand
+from numpy import linalg as LA
+
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -76,11 +78,37 @@ class Tracer():
                 reflection = firstGeometry.Material.getReflection()
                 refraction = firstGeometry.Material.getRefraction()
 
-                intersectionPoint = ray.origin + ray.direction * tClose
+                intersectionPoint = ray.origin + np.multiply(ray.direction, tClose)
                 intersectionNormal = firstGeometry.getNormal(intersectionPoint)
 
                 #new ray direction & origin point
-                ray.direction = intersectionNormal
-                ray.origin = intersectionPoint
+                newRay = Ray(intersectionNormal, intersectionPoint)
 
+                #Perfectly specular: use reflected ray
+                if reflection == 1.0:
+                    newRay.direction = self.getSpecularRay(ray.direction, intersectionNormal, intersectionPoint)
+                   # print [ray.direction, intersectionNormal, intersectionPoint]
+                   # print newRay.direction
+
+
+                ray.direction = newRay.direction
+                ray.origin = newRay.origin
+                print [ray.direction, ray.origin]
                 return (np.multiply(pixelColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1),0.1))
+
+        def getSpecularRay(self, direction, intersectNormal, intersectPoint):
+            directionNorm = 1/LA.norm(direction)
+            direction = np.multiply(direction, directionNorm)
+            newDir = np.subtract(np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal), direction )
+            print newDir
+            return newDir
+
+      #  def getDirectIllumant(geometries, direction, intersectPoint, intersectNormal, intersectColor, intersectReflection):
+           # direct = np.array(0,0,0)
+            #Check direct illuminant
+       #     for g in range(len(geometries)):
+                #Ugly solution to check if lighsource, should be a bool in material instead...
+        #        if geometries[g].Material.getReflection() == -1:
+                    #light source
+         #           lightsource = geometries[g]
+          #          lightvec = light.get
