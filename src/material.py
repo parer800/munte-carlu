@@ -38,9 +38,17 @@ class Material(object):
 	def setRadiance(self, radiance):
 		self.radiance = radiance
 
-	#Sets radiance for light sources
+	#Sets is light
 	def setLight(self, light):
 		self.light = light
+
+	#Sets is wall
+	def setWall(self, wall):
+		self.wall = wall
+
+	#Sets is transparency
+	def setTransparency(self, transparency):
+		self.transparency = transparency
 
 
 	#================================================================
@@ -71,9 +79,17 @@ class Material(object):
 	def getRadiance(self):
 		return self.radiance
 
-	#Get radiance
+	#Get is light
 	def getLight(self):
 		return self.light
+
+	#Get is wall
+	def getWall(self):
+		return self.wall
+
+	#Get is transparency
+	def getTransparency(self):
+		return self.transparency
 
 
 

@@ -3,6 +3,7 @@
 #plane.py, Class for plane objects
 
 import numpy as np
+import random as rand
 
 from geometry import *
 from ray import *
@@ -45,11 +46,12 @@ class Plane(Geometry):
     def getNormal(self, surfacePoint):
     	return self.normal
 
-    def getWidth(self):
-    	return width
-
-    def getHeight(self):
-    	return height
+    def getRandomPoint(self):
+        vec1 = self.pointNorthWest - self.pointSouthWest
+        vec2 = self.pointSouthEast - self.pointSouthWest
+        vec1 = vec1 * rand.random()
+        vec2 = vec2 * rand.random()
+        return self.pointSouthWest + vec1 + vec2
 
 
     #================================================================

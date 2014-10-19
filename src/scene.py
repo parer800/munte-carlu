@@ -60,7 +60,7 @@ class Scene():
         materialWallRight = Diffuse()
         materialWallRight.setColor(0.0, 0.6, 0.0)
 
-        materialBox = Diffuse()
+        materialBox = Opaque()
         materialBox.setColor(0.5, 0.5, 0.5)
 
         materialGlassSphere = Transparent()

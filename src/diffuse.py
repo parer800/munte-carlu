@@ -18,3 +18,5 @@ class Diffuse(Material):
 		#super(Diffuse, self).setIOR()
 		#super(Diffuse, self).setRadiance()
 		super(Diffuse, self).setLight(False)
+		super(Diffuse, self).setWall(True)
+		super(Diffuse, self).setTransparency(False)
