@@ -75,7 +75,6 @@ class Tracer():
 
             # Calculate shadow ray
             intersectionPoint = ray.origin + ray.direction * tClose
-            '''
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                  if (geometry[g].Material.getLight()):
@@ -83,24 +82,23 @@ class Tracer():
                     lightVec = lightPoint - intersectionPoint
                     if self.calculateShadow(intersectionPoint, lightVec):
                         return [0.0, 0.0, 0.0, 1.0]
-            '''
+            
 
 
             # Calculate direct light with Phong Shading Model
-            return self.calculateDirectLight(intersectionPoint, firstGeometry)
+            return self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
 
 
             # Return value
             # return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
 
 
-        def calculateDirectLight(self, intersectionPoint, geometryObject):
+        def calculateDirectLight(self, intersectionPoint, geometryObject, ray):
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 if (geometry[g].Material.getLight()):
                     lightPoint = geometry[g].getRandomPoint()
-                    lightVec = lightPoint - intersectionPoint
-                    #shade = (1 / np.linalg.norm(lightVec))
+                    lightVec =   lightPoint - intersectionPoint
 
                     lightDistance = np.linalg.norm(lightVec)
                     lightVecNormalized = lightVec / lightDistance
@@ -109,17 +107,27 @@ class Tracer():
                     lightDistance = lightDistance * lightDistance
 
                     geometryObjectNormal = geometryObject.getNormal(intersectionPoint)
+                    geometryObjectColor = geometryObject.Material.getColor()
+                    geometryObjectDiffuse = geometryObject.Material.getDiffuse()
+                    geometryObjectSpecular = geometryObject.Material.getSpecular()
+                    geometryObjectSpecularPower = geometryObject.Material.getSpecularPower()
 
+                    # Diffuse Color
                     NdotL = np.dot(geometryObjectNormal, lightVecNormalized)
-                    intensity = np.clip(NdotL, 0, 1)
+                    diffuse = np.clip(NdotL, 0, 1) * geometryObjectDiffuse
 
-                    diffuse = intensity * lightColor * lightRadiance / lightDistance;
+                    # Half Vector
+                    halfVector = lightVecNormalized + ray.direction
+                    halfVector = halfVector / np.linalg.norm(halfVector)
 
-                    #halfVector = lightVecNormalized + 
+                    # Specular Color
+                    NdotH = np.dot(geometryObjectNormal, halfVector)
+                    specular = np.power(np.clip(NdotH, 0, 1), geometryObjectSpecularPower) * geometryObjectSpecular
+                    #print specular
+                    # Shade
+                    #shade = (1 / np.linalg.norm(lightVec))
 
-                    break
-
-            return [0.0, 0.0, 0.0, 1.0]
+                    return (geometryObjectColor * diffuse + specular) * lightColor
 
         def calculateShadow(self, intersectionPoint, lightVec):
             shadowRay = Ray(lightVec / np.linalg.norm(lightVec), intersectionPoint)
