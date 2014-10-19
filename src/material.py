@@ -5,14 +5,6 @@ import numpy as np
 
 
 class Material(object):
-	"""A class for material attributes
-	color: 			material's color
-	specularColor: 	material's specular color
-	reflection:		material's reflection constant
-	refraction:		material's refraction
-	diffuse:		material's diffuse
-	IOR: 			material's index of refraction
-	"""
 
 	#constructor
 	def __init__(self):
@@ -22,17 +14,9 @@ class Material(object):
 	#========================== SETTERS =============================
 	#================================================================
 
-	#Set color with an array
-	def setColor(self, color=np.array([.0,.0,.0])):
-		self.color = color
-
 	#Set color with rgb
 	def setColor(self, r, g, b):
 		self.color = np.array([r, g, b])
-
-	#Set Specular color
-	def setSpecularColor(self, specularColor = np.array([.0,.0,.0])):
-		self.specularColor = specularColor
 
 	#Set Reflection
 	def setReflection(self, reflection):
@@ -50,6 +34,14 @@ class Material(object):
 	def setIOR(self, IOR):
 		self.IOR = IOR
 
+	#Sets radiance for light sources
+	def setRadiance(self, radiance):
+		self.radiance = radiance
+
+	#Sets radiance for light sources
+	def setLight(self, light):
+		self.light = light
+
 
 	#================================================================
 	#========================== GETTERS =============================
@@ -58,10 +50,6 @@ class Material(object):
 	#Get color
 	def getColor(self):
 		return self.color
-
-	#Get specular color
-	def getSpecularColor(self):
-		return self.specularColor
 
 	#Get reflection
 	def getReflection(self):
@@ -78,6 +66,14 @@ class Material(object):
 	#Get IOR
 	def getIOR(self):
 		return self.IOR
+
+	#Get radiance
+	def getRadiance(self):
+		return self.radiance
+
+	#Get radiance
+	def getLight(self):
+		return self.light
 
 
 

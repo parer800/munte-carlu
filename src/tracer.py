@@ -71,10 +71,14 @@ class Tracer():
             if iteration >20:
                 matColor = firstGeometry.Material.getColor()
                 pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
+                return pixelColor 
+
+            if (firstGeometry.Material.getLight()):
                 return pixelColor
 
             #Intersection with closest geometry, get material properties and calculate new direction for recursive call
             if(tClose<9999 and tClose>0.0001):
+
                 reflection = firstGeometry.Material.getReflection()
                 refraction = firstGeometry.Material.getRefraction()
 
