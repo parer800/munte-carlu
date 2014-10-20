@@ -81,10 +81,10 @@ class Sphere(Geometry):
 
             if underSqrt < 0:
                 # No intersection, will not be any real roots
-                return 0.0
+                return -1
             elif underSqrt == 0:
                 # One intersection (tangent), only one solution but is neglected in this case
-                return 0.0
+                return -1
             else:
                 #Intersection with sphere!
                 squareroot = underSqrt**0.5

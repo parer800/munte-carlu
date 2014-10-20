@@ -76,6 +76,7 @@ class Scene():
 
         # Wall Back
         planeBack = Plane(materialWallBack)
+        planeBack.setName("WallBack")
         planeBack.setPointSouthWest(0.0, 0.0, 0.0)
         planeBack.setPointNorthWest(0.0, 100.0, 0.0)
         planeBack.setPointNorthEast(150.0, 100.0, 0.0)
@@ -84,6 +85,7 @@ class Scene():
 
         # Wall Left
         planeLeft = Plane(materialWallLeft)
+        planeLeft.setName("WallLeft")
         planeLeft.setPointSouthWest(0.0, 0.0, 120.0)
         planeLeft.setPointNorthWest(0.0, 100.0, 120.0)
         planeLeft.setPointNorthEast(0.0, 100.0, 0.0)
@@ -92,6 +94,7 @@ class Scene():
 
         # Wall Right
         planeRight = Plane(materialWallRight)
+        planeRight.setName("WallRight")
         planeRight.setPointSouthWest(150.0, 0.0, 0.0)
         planeRight.setPointNorthWest(150.0, 100.0, 0.0)
         planeRight.setPointNorthEast(150.0, 100.0, 120.0)
@@ -100,6 +103,7 @@ class Scene():
 
         # Roof
         planeUp = Plane(materialRoof)
+        planeUp.setName("Roof")
         planeUp.setPointSouthWest(0.0, 100.0, 120.0)
         planeUp.setPointNorthWest(150.0, 100.0, 120.0)
         planeUp.setPointNorthEast(150.0, 100.0, 0.0)
@@ -108,6 +112,7 @@ class Scene():
 
         # Floor
         planeDown = Plane(materialFloor)
+        planeDown.setName("Floor")
         planeDown.setPointSouthWest(0.0, 0.0, 0.0)
         planeDown.setPointNorthWest(150.0, 0.0, 0.0)
         planeDown.setPointNorthEast(150.0, 0.0, 120.0)
@@ -116,6 +121,7 @@ class Scene():
 
         # Light Source
         areaLightSource = Plane(materialLight)
+        areaLightSource.setName("Light")
         areaLightSource.setPointSouthWest(25.0, 99.0, 80.0)
         areaLightSource.setPointNorthWest(65.0, 99.0, 80.0)
         areaLightSource.setPointNorthEast(65.0, 99.0, 60.0)
@@ -123,17 +129,26 @@ class Scene():
         areaLightSource.setNormal(0.0, -1.0, 0.0)
 
         # Sphere Front Transparent
+        sphereTest = Sphere(materialPlasticSphere)
+        sphereTest.setName("TestSphere")
+        sphereTest.setRadius(15.0)
+        sphereTest.setCenterPoint(np.array([50.0, 40.0, 30.0]))
+
+        # Sphere Front Transparent
         sphere1 = Sphere(materialGlassSphere)
+        sphere1.setName("GlassSphere")
         sphere1.setRadius(15.0)
         sphere1.setCenterPoint(np.array([100.0, 20.0, 80.0]))
 
         # Sphere Back Opaque
         sphere2 = Sphere(materialPlasticSphere)
+        sphere2.setName("PlasticSphere")
         sphere2.setRadius(20.0)
         sphere2.setCenterPoint(np.array([120.0, 40.0, 30.0]))
 
         # Box Face Up
         boxFaceUp = Plane(materialBox)
+        boxFaceUp.setName("BoxUp")
         boxFaceUp.setPointSouthWest(5.0, 40.0, 50.0)
         boxFaceUp.setPointNorthWest(35.0, 40.0, 20.0)
         boxFaceUp.setPointNorthEast(65.0, 40.0, 50.0)
@@ -142,6 +157,7 @@ class Scene():
 
         # Box Face Down
         boxFaceDown = Plane(materialBox)
+        boxFaceDown.setName("BoxDown")
         boxFaceDown.setPointNorthWest(5.0, 0.1, 50.0)
         boxFaceDown.setPointSouthWest(35.0, 0.1, 20.0)
         boxFaceDown.setPointSouthEast(65.0, 0.1, 50.0)
@@ -150,6 +166,7 @@ class Scene():
 
         # Box Face Right
         boxFaceRight = Plane(materialBox)
+        boxFaceRight.setName("BoxRight")
         boxFaceRight.setPointSouthWest(65.0, 0.1, 50.0)
         boxFaceRight.setPointNorthWest(65.0, 40.0, 50.0)
         boxFaceRight.setPointNorthEast(35.0, 40.0, 20.0)
@@ -158,6 +175,7 @@ class Scene():
 
         # Box Face Left
         boxFaceLeft = Plane(materialBox)
+        boxFaceLeft.setName("BoxLeft")
         boxFaceLeft.setPointSouthWest(5.0, 0.1, 50.0)
         boxFaceLeft.setPointNorthWest(5.0, 40.0, 50.0)
         boxFaceLeft.setPointNorthEast(35.0, 40.0, 80.0)
@@ -166,6 +184,7 @@ class Scene():
 
         # Box Face Back
         boxFaceBack = Plane(materialBox)
+        boxFaceBack.setName("BoxBack")
         boxFaceBack.setPointSouthWest(35.0, 0.1, 20.0)
         boxFaceBack.setPointNorthWest(35.0, 40.0, 20.0)
         boxFaceBack.setPointNorthEast(5.0, 40.0, 50.0)
@@ -174,11 +193,13 @@ class Scene():
 
         # Box Face Front
         boxFaceFront = Plane(materialBox)
+        boxFaceFront.setName("BoxFront")
         boxFaceFront.setPointSouthWest(35.0, 0.1, 80.0)
         boxFaceFront.setPointNorthWest(35.0, 40.0, 80.0)
         boxFaceFront.setPointNorthEast(65.0, 40.0, 50.0)
         boxFaceFront.setPointSouthEast(65.0, 0.1, 50.0)
         boxFaceFront.setNormal((1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
+        
 
         # Append all geometry objects.
         self.sceneGeometry.append(planeBack)
@@ -187,6 +208,8 @@ class Scene():
         self.sceneGeometry.append(planeUp)
         self.sceneGeometry.append(planeDown)
         self.sceneGeometry.append(areaLightSource)
+        self.sceneGeometry.append(sphereTest)
+        '''
         self.sceneGeometry.append(sphere1)
         self.sceneGeometry.append(sphere2)
         self.sceneGeometry.append(boxFaceUp)
@@ -195,6 +218,7 @@ class Scene():
         self.sceneGeometry.append(boxFaceLeft)
         self.sceneGeometry.append(boxFaceBack)
         self.sceneGeometry.append(boxFaceFront)
+        '''
 
 		
 

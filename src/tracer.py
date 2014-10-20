@@ -13,6 +13,7 @@ from ray import *
 class Tracer():
         # Constructor Tracer
         def __init__(self, width, height):
+            self.MAX_DISTANCE = 999
             self.width = width
             self.height = height
             self.Scene = Scene(np.array([75.0, 50.0, 250.0]), 45.0, (width / height))
@@ -21,7 +22,7 @@ class Tracer():
         def init(self):
             self.Scene.setupScene()
 
-        def startRayTrace(self, pixelPosX, pixelPosY):
+        def startRayTrace(self, pixelPosX, pixelPosY, importance):
              # Calculate ray origin and direction by pixel position
             rayDirection = np.array([0.0, 0.0, 0.0])
             rayOrigin = np.array([0.0, 0.0, 0.0])
@@ -35,13 +36,13 @@ class Tracer():
             ray = Ray(rayDirection, rayOrigin)
 
             #Start recursive ray trace
-            return self.traceRay(ray, 1, 1.0)
+            return self.traceRay(ray, 1, importance)
 
         def traceRay(self, ray, iteration, importance):
 
 
             # IF number of iterations > Maxiterations OR importance < minimiimportance
-            if iteration > 20 or importance < 0.1:
+            if iteration > 20 or importance < 0.0001:
                 return [0.0, 0.0, 0.0, 1.0]
 
 
@@ -50,10 +51,9 @@ class Tracer():
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 t = geometry[g].intersect(ray)
-                if t > 0 and t < tClose:
+                if t > -1 and t < tClose:
                     tClose = t
                     firstGeometry = geometry[g]
-
 
             # IF geometry is light then return light color
             if firstGeometry.Material.getLight() == True: 
@@ -62,36 +62,52 @@ class Tracer():
 
 
             # IF intersection point > max distance
-            if tClose > 999:
+            if tClose > self.MAX_DISTANCE:
                 return [0.0, 0.0, 0.0, 1.0]
 
 
             # IF reflective or refractive object
             # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
+            if firstGeometry.Material.getLight() == False and firstGeometry.Material.getWall() == False:
+                test = 1
 
             # ELSE IF diffuse lambertian BRDF
             # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
+            # Monte-Carlo BRDF
+            '''
+            elif firstGeometry.Material.getWall() == True:
+                rr = rand.random()
+                if rr < 0.5: # STATIC VALUE KAN ÄNDRAS TILL ANNAT VÄRDE
+                    intersectionPoint = ray.origin + ray.direction * tClose
+                    newRay = calculateDiffuseRay(ray.direction, firstGeometry.getNormal(intersectionPoint))
+                    #accPixelValue = traceRay(newRay, iteration+1, importance):
+            '''
 
-
-            # Calculate shadow ray
+            # Calculate shadow ray            
             intersectionPoint = ray.origin + ray.direction * tClose
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
-                 if (geometry[g].Material.getLight()):
+                 if geometry[g].Material.getLight() == True:
                     lightPoint = geometry[g].getRandomPoint()
                     lightVec = lightPoint - intersectionPoint
+                    
                     if self.calculateShadow(intersectionPoint, lightVec):
                         return [0.0, 0.0, 0.0, 1.0]
             
 
 
             # Calculate direct light with Phong Shading Model
+            #return [1.0, 0.0, 0.0, 1.0]
             return self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
 
 
             # Return value
             # return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
 
+
+        def calculateDiffuseRay(rayDirection, pointNormal):
+            # FORTSÄTT HÄR!
+            return 0.0
 
         def calculateDirectLight(self, intersectionPoint, geometryObject, ray):
             geometry = self.Scene.sceneGeometry
@@ -123,7 +139,7 @@ class Tracer():
                     # Specular Color
                     NdotH = np.dot(geometryObjectNormal, halfVector)
                     specular = np.power(np.clip(NdotH, 0, 1), geometryObjectSpecularPower) * geometryObjectSpecular
-                    #print specular
+
                     # Shade
                     #shade = (1 / np.linalg.norm(lightVec))
 
@@ -131,14 +147,22 @@ class Tracer():
 
         def calculateShadow(self, intersectionPoint, lightVec):
             shadowRay = Ray(lightVec / np.linalg.norm(lightVec), intersectionPoint)
+            
+            tClose = 999999
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 if geometry[g].Material.getLight() == False and geometry[g].Material.getTransparency() == False:
                     t = geometry[g].intersect(shadowRay)
-                    if t < 999 and t > 0.0:
-                        shadowRayIntersectionLength = np.linalg.norm(shadowRay.origin + shadowRay.direction * t)
-                        if shadowRayIntersectionLength < np.linalg.norm(lightVec):
-                            return True
+                    if t > -1 and t < tClose:
+                        tClose = t
+
+            if tClose < self.MAX_DISTANCE:
+                shadowRayIntersectionPoint = shadowRay.origin + shadowRay.direction * tClose
+                shadowRayIntersectionLength = np.linalg.norm(shadowRayIntersectionPoint - intersectionPoint)
+                if shadowRayIntersectionLength < np.linalg.norm(lightVec):
+                    return True
+
+
 
             return False
 
