@@ -5,6 +5,7 @@
 import numpy as np
 import time
 import sys
+import random as rand
 
 from PIL import Image
 from OpenGL.GL import *
@@ -27,6 +28,7 @@ class Render():
         height = self.height
         width = self.width
         createPixel = self.createPixel
+        SAMPLE_COUNT = 1
 
         # Creating image to store values in
         img = Image.new( 'RGBA', (width,height), "black")
@@ -38,7 +40,7 @@ class Render():
 
         for y in range(0, height):
             for x in range(0, width):
-                pix = createPixel(x, y)
+                pix = createPixel(x, y, SAMPLE_COUNT)
                 imgPixels[x, height-y-1] = (int(pix[0]*255), int(pix[1]*255), int(pix[2]*255), int(pix[3]*255))
                 pixelData[x + (y * width)] = pix
 
@@ -49,17 +51,22 @@ class Render():
         sys.stdout.write("\n")
 
         #img.save('../out.png')
-        img.save('../Cornell_Box_' + str(width) + 'x' + str(height) + '.png')
+        img.save('../Cornell_Box_' + str(width) + 'x' + str(height) + '_' + str(SAMPLE_COUNT) + 'SPP' + '.png')
         self.pixelData = pixelData
 
     # Render a single pixel
-    def createPixel(self, x, y):
+    def createPixel(self, x, y, SAMPLE_COUNT):
+        
+        accumulatedPixel = [0.0, 0.0, 0.0, 1.0];
+        for k in range(0, SAMPLE_COUNT):
+            offsetX = rand.random()
+            offsetY = rand.random()
+            tracedPixel = self.Tracer.startRayTrace(x + offsetX, y + offsetY, 1.0/SAMPLE_COUNT)
+            accumulatedPixel[0] += tracedPixel[0]
+            accumulatedPixel[1] += tracedPixel[1]
+            accumulatedPixel[2] += tracedPixel[2]
 
-        # IMPLEMENT ANTI-ALIASING HERE, MULTIPLE RAYS PER PIXEL
-        offsetX = 0.5
-        offsetY = 0.5
-        result = self.Tracer.startRayTrace(x + offsetX, y + offsetY)
-        return [result[0], result[1], result[2], 1.0]
+        return [accumulatedPixel[0]/SAMPLE_COUNT, accumulatedPixel[1]/SAMPLE_COUNT, accumulatedPixel[2]/SAMPLE_COUNT, 1.0]
 
 
 

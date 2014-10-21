@@ -30,6 +30,14 @@ class Material(object):
 	def setDiffuse(self, diffuse):
 		self.diffuse = diffuse
 
+	# Set specular
+	def setSpecular(self, specular):
+		self.specular = specular
+
+	# Set specular power
+	def setSpecularPower(self, specularPower):
+		self.specularPower = specularPower
+
 	#Sets how much a ray traveling through the material will be refracted
 	def setIOR(self, IOR):
 		self.IOR = IOR
@@ -70,6 +78,14 @@ class Material(object):
 	#Get diffuse
 	def getDiffuse(self):
 		return self.diffuse
+
+	# Get specular
+	def getSpecular(self):
+		return self.specular
+
+	# Get specular power
+	def getSpecularPower(self):
+		return self.specularPower
 
 	#Get IOR
 	def getIOR(self):

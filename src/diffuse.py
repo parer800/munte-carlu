@@ -15,6 +15,8 @@ class Diffuse(Material):
 		super(Diffuse, self).setReflection(0.0)
 		super(Diffuse, self).setRefraction(0.0)
 		super(Diffuse, self).setDiffuse(1.0)
+		super(Diffuse, self).setSpecular(0.0)
+		super(Diffuse, self).setSpecularPower(0.0)
 		#super(Diffuse, self).setIOR()
 		#super(Diffuse, self).setRadiance()
 		super(Diffuse, self).setLight(False)

@@ -15,6 +15,7 @@ from ray import *
 class Tracer():
         # Constructor Tracer
         def __init__(self, width, height):
+            self.MAX_DISTANCE = 999
             self.width = width
             self.height = height
             self.Scene = Scene(np.array([75.0, 50.0, 250.0]), 45.0, (width / height))
@@ -23,7 +24,7 @@ class Tracer():
         def init(self):
             self.Scene.setupScene()
 
-        def startRayTrace(self, pixelPosX, pixelPosY):
+        def startRayTrace(self, pixelPosX, pixelPosY, importance):
              # Calculate ray origin and direction by pixel position
             rayDirection = np.array([0.0, 0.0, 0.0])
             rayOrigin = np.array([0.0, 0.0, 0.0])
@@ -37,13 +38,13 @@ class Tracer():
             ray = Ray(rayDirection, rayOrigin)
 
             #Start recursive ray trace
-            return self.traceRay(ray, 1, 1.0)
+            return self.traceRay(ray, 1, importance)
 
         def traceRay(self, ray, iteration, importance):
 
 
             # IF number of iterations > Maxiterations OR importance < minimiimportance
-            if iteration > 20 or importance < 0.1:
+            if iteration > 20 or importance < 0.0001:
                 return [0.0, 0.0, 0.0, 1.0]
 
 
@@ -52,14 +53,12 @@ class Tracer():
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 t = geometry[g].intersect(ray)
-                if t > 0 and t < tClose:
+                if t > -1 and t < tClose:
                     tClose = t
                     firstGeometry = geometry[g]
 
-
-
             # IF intersection point > max distance
-            if tClose > 999:
+            if tClose > self.MAX_DISTANCE:
                 return [0.0, 0.0, 0.0, 1.0]
 
             # IF geometry is light then return light color
@@ -72,25 +71,6 @@ class Tracer():
             # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
             reflection = firstGeometry.Material.getReflection()
             refraction = firstGeometry.Material.getRefraction()
-
-
-
-
-            # ELSE IF diffuse lambertian BRDF
-            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
-
-
-            # Calculate shadow ray
-
-            '''
-            geometry = self.Scene.sceneGeometry
-            for g in range(len(geometry)):
-                 if (geometry[g].Material.getLight()):
-                    lightPoint = geometry[g].getRandomPoint()
-                    lightVec = lightPoint - intersectionPoint
-                    if self.calculateShadow(intersectionPoint, lightVec):
-                        return [0.0, 0.0, 0.0, 1.0]
-            '''
             intersectionPoint = ray.origin + ray.direction * tClose
             intersectionNormal = firstGeometry.getNormal(intersectionPoint)
 
@@ -125,14 +105,45 @@ class Tracer():
 
                 accPixelValue =  (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0),0.1))
 
-            # Calculate direct light with Phong Shading Model
-            #return self.calculateDirectLight(intersectionPoint, firstGeometry)
 
-            objectColor = materialColor
 
+
+
+
+            # ELSE IF diffuse lambertian BRDF
+            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
+            # Monte-Carlo BRDF
+            '''
+            elif firstGeometry.Material.getWall() == True:
+                rr = rand.random()
+                if rr < 0.5: # STATIC VALUE KAN ÄNDRAS TILL ANNAT VÄRDE
+                    intersectionPoint = ray.origin + ray.direction * tClose
+                    newRay = calculateDiffuseRay(ray.direction, firstGeometry.getNormal(intersectionPoint))
+                    #accPixelValue = traceRay(newRay, iteration+1, importance):
+            '''
+
+
+
+
+
+
+            # Calculate shadow ray            
+            intersectionPoint = ray.origin + ray.direction * tClose
+            geometry = self.Scene.sceneGeometry
+            for g in range(len(geometry)):
+                 if geometry[g].Material.getLight() == True:
+                    lightPoint = geometry[g].getRandomPoint()
+                    lightVec = lightPoint - intersectionPoint
+                    
+                    if self.calculateShadow(intersectionPoint, lightVec):
+                        return [0.0, 0.0, 0.0, 1.0]
+
+            #return [1.0, 0.0, 0.0, 1.0]
+
+            directLight =  self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
             # Return value
 
-            return (np.add(accPixelValue, objectColor))
+            return (np.add(accPixelValue, directLight))
             #return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
 
         def getSpecularContribution(self, ray, object, iteration, importance):
@@ -156,13 +167,16 @@ class Tracer():
             return newDir
 
 
-        def calculateDirectLight(self, intersectionPoint, geometryObject):
+        def calculateDiffuseRay(rayDirection, pointNormal):
+            # FORTSÄTT HÄR!
+            return 0.0
+
+        def calculateDirectLight(self, intersectionPoint, geometryObject, ray):
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 if (geometry[g].Material.getLight()):
                     lightPoint = geometry[g].getRandomPoint()
-                    lightVec = lightPoint - intersectionPoint
-                    #shade = (1 / np.linalg.norm(lightVec))
+                    lightVec =   lightPoint - intersectionPoint
 
                     lightDistance = np.linalg.norm(lightVec)
                     lightVecNormalized = lightVec / lightDistance
@@ -171,28 +185,47 @@ class Tracer():
                     lightDistance = lightDistance * lightDistance
 
                     geometryObjectNormal = geometryObject.getNormal(intersectionPoint)
+                    geometryObjectColor = geometryObject.Material.getColor()
+                    geometryObjectDiffuse = geometryObject.Material.getDiffuse()
+                    geometryObjectSpecular = geometryObject.Material.getSpecular()
+                    geometryObjectSpecularPower = geometryObject.Material.getSpecularPower()
 
+                    # Diffuse Color
                     NdotL = np.dot(geometryObjectNormal, lightVecNormalized)
-                    intensity = np.clip(NdotL, 0, 1)
+                    diffuse = np.clip(NdotL, 0, 1) * geometryObjectDiffuse
 
-                    diffuse = intensity * lightColor * lightRadiance / lightDistance;
+                    # Half Vector
+                    halfVector = lightVecNormalized + ray.direction
+                    halfVector = halfVector / np.linalg.norm(halfVector)
 
-                    #halfVector = lightVecNormalized +
+                    # Specular Color
+                    NdotH = np.dot(geometryObjectNormal, halfVector)
+                    specular = np.power(np.clip(NdotH, 0, 1), geometryObjectSpecularPower) * geometryObjectSpecular
 
-                    break
+                    # Shade
+                    #shade = (1 / np.linalg.norm(lightVec))
+                    color = (geometryObjectColor * diffuse + specular) * lightColor
 
-            return [0.0, 0.0, 0.0, 1.0]
+                    return [color[0], color[1], color[2], 1.0]
 
         def calculateShadow(self, intersectionPoint, lightVec):
             shadowRay = Ray(lightVec / np.linalg.norm(lightVec), intersectionPoint)
+            
+            tClose = 999999
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 if geometry[g].Material.getLight() == False and geometry[g].Material.getTransparency() == False:
                     t = geometry[g].intersect(shadowRay)
-                    if t < 999 and t > 0.0:
-                        shadowRayIntersectionLength = np.linalg.norm(shadowRay.origin + shadowRay.direction * t)
-                        if shadowRayIntersectionLength < np.linalg.norm(lightVec):
-                            return True
+                    if t > -1 and t < tClose:
+                        tClose = t
+
+            if tClose < self.MAX_DISTANCE:
+                shadowRayIntersectionPoint = shadowRay.origin + shadowRay.direction * tClose
+                shadowRayIntersectionLength = np.linalg.norm(shadowRayIntersectionPoint - intersectionPoint)
+                if shadowRayIntersectionLength < np.linalg.norm(lightVec):
+                    return True
+
+
 
             return False
 
