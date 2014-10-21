@@ -18,3 +18,5 @@ class Light(Material):
 		#super(Light, self).setIOR()
 		super(Light, self).setRadiance(300)
 		super(Light, self).setLight(True)
+		super(Light, self).setWall(False)
+		super(Light, self).setTransparency(False)

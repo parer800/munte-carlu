@@ -18,3 +18,5 @@ class Opaque(Material):
 		#super(Opaque, self).setIOR()
 		#super(Opaque, self).setRadiance()
 		super(Opaque, self).setLight(False)
+		super(Opaque, self).setWall(False)
+		super(Opaque, self).setTransparency(False)

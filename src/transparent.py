@@ -18,3 +18,5 @@ class Transparent(Material):
 		#super(Transparent, self).setIOR()
 		#super(Transparent, self).setRadiance()
 		super(Transparent, self).setLight(False)
+		super(Transparent, self).setWall(False)
+		super(Transparent, self).setTransparency(True)

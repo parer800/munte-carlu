@@ -37,82 +37,226 @@ class Tracer():
             ray = Ray(rayDirection, rayOrigin)
 
             #Start recursive ray trace
-            return self.traceRay(ray, 1)
+            return self.traceRay(ray, 1, 1.0)
 
-        def traceRay(self, ray, iteration):
-            if isinstance(ray, Ray) is False:
-                return None
+        def traceRay(self, ray, iteration, importance):
 
 
+            # IF number of iterations > Maxiterations OR importance < minimiimportance
+            if iteration > 20 or importance < 0.1:
+                return [0.0, 0.0, 0.0, 1.0]
 
-            # Russian Roulette random variable
-            rr = rand.random()
 
-            # Pixel Color
-            pixelColor = [0.0, 0.0, 0.0, 1.0]
-
-            # Check first intersection
-            tClose = 9999
-
-            # Go through all geometry in the scene
+            # Check intersection point of closest geometry
+            tClose = 999999
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
-                matColor = geometry[g].Material.getColor()
                 t = geometry[g].intersect(ray)
                 if t > 0 and t < tClose:
                     tClose = t
-                    pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
                     firstGeometry = geometry[g]
 
-            if tClose>=9999:
-                return pixelColor
-
-            #Exceeded number of iterations, return closest intersected material color
-            if iteration >20:
-                matColor = firstGeometry.Material.getColor()
-                pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
-                return pixelColor 
-
-            if (firstGeometry.Material.getLight()):
-                return pixelColor
-
-            #Intersection with closest geometry, get material properties and calculate new direction for recursive call
-            if(tClose<9999 and tClose>0.0001):
-
-                reflection = firstGeometry.Material.getReflection()
-                refraction = firstGeometry.Material.getRefraction()
-
-                intersectionPoint = ray.origin + np.multiply(ray.direction, tClose)
-                intersectionNormal = firstGeometry.getNormal(intersectionPoint)
-
-                #new ray direction & origin point
-                newRay = Ray(intersectionNormal, intersectionPoint)
-
-                #Perfectly specular: use reflected ray
-                if reflection == 1.0:
-                    newRay.direction = self.getSpecularRay(ray.direction, intersectionNormal, intersectionPoint)
-                   # print [ray.direction, intersectionNormal, intersectionPoint]
-                   # print newRay.direction
 
 
-                ray.direction = newRay.direction
+            # IF intersection point > max distance
+            if tClose > 999:
+                return [0.0, 0.0, 0.0, 1.0]
+
+            # IF geometry is light then return light color
+            if firstGeometry.Material.getLight() == True:
+                lightColor = firstGeometry.Material.getColor()
+                return [lightColor[0], lightColor[1], lightColor[2], 1.0]
+
+
+            # IF reflective or refractive object
+            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
+            reflection = firstGeometry.Material.getReflection()
+            refraction = firstGeometry.Material.getRefraction()
+
+
+
+
+            # ELSE IF diffuse lambertian BRDF
+            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
+
+
+            # Calculate shadow ray
+
+            '''
+            geometry = self.Scene.sceneGeometry
+            for g in range(len(geometry)):
+                 if (geometry[g].Material.getLight()):
+                    lightPoint = geometry[g].getRandomPoint()
+                    lightVec = lightPoint - intersectionPoint
+                    if self.calculateShadow(intersectionPoint, lightVec):
+                        return [0.0, 0.0, 0.0, 1.0]
+            '''
+            intersectionPoint = ray.origin + ray.direction * tClose
+            intersectionNormal = firstGeometry.getNormal(intersectionPoint)
+
+            #new ray direction & origin point
+            newRay = Ray(intersectionNormal, intersectionPoint)
+            accPixelValue =  [0.0, 0.0, 0.0, 1.0]
+            #Perfectly specular: use reflected ray
+            materialColor = firstGeometry.Material.getColor()
+            materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
+            if firstGeometry.Material.getLight() is False and firstGeometry.Material.getWall() is False:
+
+                newRay.direction = self.getSpecularRay(ray, intersectionNormal, intersectionPoint)
+                #color = blinn[0]
+
+                s = LA.norm(newRay.direction)
+                #print blinn
+                newRay.direction = np.divide(newRay.direction ,s)
+               # print [ray.direction, intersectionNormal, intersectionPoint]
+               # print newRay.direction
+
+
+                ray.direction = self.getSpecularRay(ray, intersectionNormal, intersectionPoint)
                 ray.origin = newRay.origin
-                print [ray.direction, ray.origin]
-                return (np.multiply(pixelColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1),0.1))
 
-        def getSpecularRay(self, direction, intersectNormal, intersectPoint):
+                #accPixelValue = self.getSpecularContribution(ray, firstGeometry, iteration, importance)
+
+                #print [ray.direction, ray.origin]
+
+                #return ray.direction
+                #print accPixelValue
+                #return accPixelValue
+
+                accPixelValue =  (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0),0.1))
+
+            # Calculate direct light with Phong Shading Model
+            #return self.calculateDirectLight(intersectionPoint, firstGeometry)
+
+            objectColor = materialColor
+
+            # Return value
+
+            return (np.add(accPixelValue, objectColor))
+            #return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
+
+        def getSpecularContribution(self, ray, object, iteration, importance):
+                materialColor = object.Material.getColor()
+                materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
+                return (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0),0.1))
+
+
+        def getSpecularRay(self, ray, intersectNormal, intersectPoint):
+            '''
+                earlier perfect reflection, use Blinn-Phong instead
             directionNorm = 1/LA.norm(direction)
             direction = np.multiply(direction, directionNorm)
-            newDir = np.subtract(np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal), direction )
-            print newDir
+            newDir = np.subtract(direction, np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal) )'''
+            direction = ray.direction
+            directionNorm = 1/LA.norm(direction)
+            direction = np.multiply(direction, directionNorm)
+            newDir = np.subtract(direction, np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal) )
+            newDir = newDir / LA.norm(newDir)
+
             return newDir
 
-      #  def getDirectIllumant(geometries, direction, intersectPoint, intersectNormal, intersectColor, intersectReflection):
-           # direct = np.array(0,0,0)
-            #Check direct illuminant
-       #     for g in range(len(geometries)):
-                #Ugly solution to check if lighsource, should be a bool in material instead...
-        #        if geometries[g].Material.getReflection() == -1:
-                    #light source
-         #           lightsource = geometries[g]
-          #          lightvec = light.get
+
+        def calculateDirectLight(self, intersectionPoint, geometryObject):
+            geometry = self.Scene.sceneGeometry
+            for g in range(len(geometry)):
+                if (geometry[g].Material.getLight()):
+                    lightPoint = geometry[g].getRandomPoint()
+                    lightVec = lightPoint - intersectionPoint
+                    #shade = (1 / np.linalg.norm(lightVec))
+
+                    lightDistance = np.linalg.norm(lightVec)
+                    lightVecNormalized = lightVec / lightDistance
+                    lightColor = geometry[g].Material.getColor()
+                    lightRadiance = geometry[g].Material.getRadiance()
+                    lightDistance = lightDistance * lightDistance
+
+                    geometryObjectNormal = geometryObject.getNormal(intersectionPoint)
+
+                    NdotL = np.dot(geometryObjectNormal, lightVecNormalized)
+                    intensity = np.clip(NdotL, 0, 1)
+
+                    diffuse = intensity * lightColor * lightRadiance / lightDistance;
+
+                    #halfVector = lightVecNormalized +
+
+                    break
+
+            return [0.0, 0.0, 0.0, 1.0]
+
+        def calculateShadow(self, intersectionPoint, lightVec):
+            shadowRay = Ray(lightVec / np.linalg.norm(lightVec), intersectionPoint)
+            geometry = self.Scene.sceneGeometry
+            for g in range(len(geometry)):
+                if geometry[g].Material.getLight() == False and geometry[g].Material.getTransparency() == False:
+                    t = geometry[g].intersect(shadowRay)
+                    if t < 999 and t > 0.0:
+                        shadowRayIntersectionLength = np.linalg.norm(shadowRay.origin + shadowRay.direction * t)
+                        if shadowRayIntersectionLength < np.linalg.norm(lightVec):
+                            return True
+
+            return False
+
+
+
+
+        '''
+        if isinstance(ray, Ray) is False:
+            return None
+
+        # Russian Roulette random variable
+        rr = rand.random()
+
+        # Pixel Color
+        pixelColor = [0.0, 0.0, 0.0, 1.0]
+
+        # Check first intersection
+        tClose = 9999
+
+        # Go through all geometry in the scene
+        geometry = self.Scene.sceneGeometry
+        for g in range(len(geometry)):
+            matColor = geometry[g].Material.getColor()
+            t = geometry[g].intersect(ray)
+            if t > 0 and t < tClose:
+                tClose = t
+                pixelColor =  [matColor[0], matColor[1], matColor[2], 1.0]
+                firstGeometry = geometry[g]
+
+        if tClose >= 9999:
+            return pixelColor
+
+        intersectionPoint = ray.origin + ray.direction * tClose
+        if self.calculateDirectLight(None, intersectionPoint):
+            return [0, 0, 0, 1.0]
+
+        matColor = firstGeometry.Material.getColor()
+        pixelColor = [matColor[0], matColor[1], matColor[2], 1.0]
+        return pixelColor
+        '''
+        '''
+        #Exceeded number of iterations, return closest intersected material color
+        if iteration >20:
+            matColor = firstGeometry.Material.getColor()
+            pixelColor = [matColor[0], matColor[1], matColor[2], 1.0]
+            return pixelColor 
+
+        if (firstGeometry.Material.getLight()):
+            return pixelColor
+        '''
+
+        '''
+        #Intersection with closest geometry, get material properties and calculate new direction for recursive call
+        if(tClose<9999 and tClose>0.0001):
+
+            reflection = firstGeometry.Material.getReflection()
+            refraction = firstGeometry.Material.getRefraction()
+
+            intersectionPoint = ray.origin + ray.direction * tClose
+            intersectionNormal = firstGeometry.getNormal(intersectionPoint)
+
+            #new ray direction & origin point
+            ray.direction = intersectionNormal
+            ray.origin = intersectionPoint
+
+            return (np.multiply(pixelColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1),0.1))
+        '''
