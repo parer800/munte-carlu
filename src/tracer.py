@@ -66,6 +66,7 @@ class Tracer():
                 return [0.0, 0.0, 0.0, 1.0]
 
 
+            accPixelValue = [0.0, 0.0, 0.0]
             # IF reflective or refractive object
             # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
             if firstGeometry.Material.getLight() == False and firstGeometry.Material.getWall() == False:
@@ -74,14 +75,13 @@ class Tracer():
             # ELSE IF diffuse lambertian BRDF
             # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
             # Monte-Carlo BRDF
-            '''
-            elif firstGeometry.Material.getWall() == True:
+            elif firstGeometry.Material.getWall() == True and firstGeometry.getName() == 'WallBack':
                 rr = rand.random()
                 if rr < 0.5: # STATIC VALUE KAN ÄNDRAS TILL ANNAT VÄRDE
                     intersectionPoint = ray.origin + ray.direction * tClose
-                    newRay = calculateDiffuseRay(ray.direction, firstGeometry.getNormal(intersectionPoint))
-                    #accPixelValue = traceRay(newRay, iteration+1, importance):
-            '''
+                    newRay = self.calculateDiffuseRay(intersectionPoint, firstGeometry.getNormal(intersectionPoint))
+                    accPixelValue = self.traceRay(newRay, iteration+1, importance)
+
 
             # Calculate shadow ray            
             intersectionPoint = ray.origin + ray.direction * tClose
@@ -98,16 +98,28 @@ class Tracer():
 
             # Calculate direct light with Phong Shading Model
             #return [1.0, 0.0, 0.0, 1.0]
-            return self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
+            return accPixelValue + self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
 
 
             # Return value
             # return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
 
 
-        def calculateDiffuseRay(rayDirection, pointNormal):
-            # FORTSÄTT HÄR!
-            return 0.0
+        def calculateDiffuseRay(self, intersectionPoint, pointNormal):
+
+            r1 = rand.random()
+            r2 = rand.random()
+            phi = 2 * np.pi * r1
+            theta = np.arccos(np.sqrt(r2))
+
+            # To cartesian coordinates
+            x = np.cos(phi) * np.sin(theta)
+            y = np.sin(phi) * np.sin(theta)
+            z = np.cos(theta)
+
+            randomRay = Ray([x, y, z], intersectionPoint)
+
+            return randomRay
 
         def calculateDirectLight(self, intersectionPoint, geometryObject, ray):
             geometry = self.Scene.sceneGeometry
