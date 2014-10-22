@@ -65,6 +65,7 @@ class Scene():
 
         materialGlassSphere = Transparent()
         materialGlassSphere.setColor(0.2, 0.2, 0.8)
+        materialGlassSphere.setIOR(1.5)
 
         materialPlasticSphere = Opaque()
         materialPlasticSphere.setColor(0.8, 0.2, 0.2)
@@ -199,7 +200,7 @@ class Scene():
         boxFaceFront.setPointNorthEast(65.0, 40.0, 50.0)
         boxFaceFront.setPointSouthEast(65.0, 0.1, 50.0)
         boxFaceFront.setNormal((1/np.sqrt(2)), 0.0, (1/np.sqrt(2)))
-        
+
 
         # Append all geometry objects.
         self.sceneGeometry.append(planeBack)
@@ -209,8 +210,9 @@ class Scene():
         self.sceneGeometry.append(planeDown)
         self.sceneGeometry.append(areaLightSource)
         self.sceneGeometry.append(sphereTest)
-        '''
+'''
         self.sceneGeometry.append(sphere1)
+
         self.sceneGeometry.append(sphere2)
         self.sceneGeometry.append(boxFaceUp)
         self.sceneGeometry.append(boxFaceDown)

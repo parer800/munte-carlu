@@ -28,7 +28,7 @@ class Render():
         height = self.height
         width = self.width
         createPixel = self.createPixel
-        SAMPLE_COUNT = 1
+        SAMPLE_COUNT = 2
 
         # Creating image to store values in
         img = Image.new( 'RGBA', (width,height), "black")
@@ -62,12 +62,13 @@ class Render():
             offsetX = rand.random()
             offsetY = rand.random()
             tracedPixel = self.Tracer.startRayTrace(x + offsetX, y + offsetY, 1.0/SAMPLE_COUNT)
+            #tracedPixel = self.Tracer.startRayTrace(x + offsetX, y + offsetY, 1.0)
             accumulatedPixel[0] += tracedPixel[0]
             accumulatedPixel[1] += tracedPixel[1]
             accumulatedPixel[2] += tracedPixel[2]
 
-        return [accumulatedPixel[0]/SAMPLE_COUNT, accumulatedPixel[1]/SAMPLE_COUNT, accumulatedPixel[2]/SAMPLE_COUNT, 1.0]
-
+        return [accumulatedPixel[0], accumulatedPixel[1], accumulatedPixel[2], 1.0]
+        #return [accumulatedPixel[0]/SAMPLE_COUNT, accumulatedPixel[1]/SAMPLE_COUNT, accumulatedPixel[2]/SAMPLE_COUNT, 1.0]
 
 
     # Draw Renderer

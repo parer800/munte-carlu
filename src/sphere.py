@@ -31,7 +31,7 @@ class Sphere(Geometry):
 
     #Set center point
     def setCenterPoint(self, c):
-        self.centerPoint = c
+        self.centerPoint = np.array(c)
 
     #================================================================
     #========================== GETTERS =============================
@@ -74,23 +74,49 @@ class Sphere(Geometry):
             # Gives a quadratic equation at^2 + bt + c = 0
             # => ... => a = ||V||^2, b = 2*V(P0 - O), c = ||P0 - O||^2 - r^2
             # Will result in t = -b/2 +- sqrt((b/2)^2 - c) = -V(P0 - O +- sqrt((V(P0 - O))^2 - c)
-            a = 1 # since V is a unit vector => a = ||V||^2 = 1
-            b = 2 * np.dot(r.direction, r.origin - self.centerPoint)
-            c = LA.norm(r.origin - self.centerPoint)**2 - self.radius**2 #(**2 = ^2)
-            underSqrt = (b/2)**2 - a*c
 
-            if underSqrt < 0:
+            L = r.origin - self.centerPoint
+
+            a = np.dot(r.direction, r.direction)
+            b =  2*np.dot(r.direction, L)
+            c = np.dot(L, L) - self.radius**2 #(**2 = ^2)
+
+            disc = b*b - 4*a*c
+
+            if disc < 0.0:
                 # No intersection, will not be any real roots
                 return -1
-            elif underSqrt == 0:
-                # One intersection (tangent), only one solution but is neglected in this case
-                return -1
+
+            distSqrt = np.sqrt(disc)
+            if b < 0.0:
+                q = (-b - distSqrt)/2
             else:
-                #Intersection with sphere!
-                squareroot = underSqrt**0.5
-                #We only want to know the intersection point closest to the camera; so select the lowest solution
-                t = -(b/2)/a - squareroot
-                
-                #intersection = t*vecMult(t, r.direction)
-                #return intersection
-                return t
+                q  = (-b + distSqrt)/2
+
+            t0 = q/a
+            #Can occur division with zero (q=0.0) when distance between ray.origin and center of sphere equals the radius of the sphere
+            t1 = c/q
+
+
+            if t0 > t1:
+                temp = t0
+                t0 = t1
+                t1 = temp
+
+            if t1 < 0.0:
+                return -1
+
+            if t0 < 0.0:
+                t = t1
+            else:
+                t = t0
+
+            return t
+
+'''
+#Test line sphere intersection, this result in a t of 3.15978504097, which seems to be correct
+s = Sphere(Material(), 2.0)
+s.setCenterPoint([5.0, 0.0, 0.0])
+r = Ray([5.0, 0.0, 1.0], [0.0, 0.0, 0.0])
+print s.intersect(r)
+'''
