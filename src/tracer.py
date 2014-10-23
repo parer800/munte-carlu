@@ -44,6 +44,9 @@ class Tracer():
 
         def traceRay(self, ray, iteration, importance, isInside):
 
+            DIFFUSE_RAY_COUNT = 1
+            SHADOW_RAY_COUNT = 2
+
             # IF number of iterations > Maxiterations OR importance < minimiimportance
             if iteration > 10:
                 return [0.0, 0.0, 0.0, 1.0]
@@ -67,32 +70,21 @@ class Tracer():
                 lightColor = firstGeometry.Material.getColor()
                 return [lightColor[0], lightColor[1], lightColor[2], 1.0]
 
+            tClose -= 0.01
 
 
 
+            accPixelValue = [0.0, 0.0, 0.0, 1.0]
 
-            accPixelValue = [0.0, 0.0, 0.0]
             # IF reflective or refractive object
-            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
-            reflection = firstGeometry.Material.getReflection()
-            refraction = firstGeometry.Material.getRefraction()
-            intersectionPoint = ray.origin + ray.direction * tClose
+            if firstGeometry.Material.getLight() is False and firstGeometry.Material.getWall() is False: 
 
-           # print tClose
-            intersectionNormal = firstGeometry.getNormal(intersectionPoint)
+                reflection = firstGeometry.Material.getReflection()
+                refraction = firstGeometry.Material.getRefraction()
+                intersectionPoint = ray.origin + ray.direction * tClose
+                intersectionNormal = firstGeometry.getNormal(intersectionPoint)
 
-            #new ray direction & origin point
-            newRay = Ray(intersectionNormal, intersectionPoint)
-            accPixelValue =  [0.0, 0.0, 0.0, 1.0]
-            #Perfectly specular: use reflected ray
-
-            if firstGeometry.Material.getLight() is False and firstGeometry.Material.getWall() is False:
-                #Refractive and Reflective
-
-                #Perfect reflection direction ()
-                ray.origin = newRay.origin - 0.01*ray.direction
-                ray.direction = self.getSpecularRay(ray, intersectionNormal, intersectionPoint)
-
+                newRay = Ray(self.getSpecularRay(ray.direction, intersectionNormal, intersectionPoint), intersectionPoint)
 
                 refractedColor = [0.0, 0.0, 0.0, 1.0]
 
@@ -113,44 +105,64 @@ class Tracer():
                 materialColor = firstGeometry.Material.getColor()
                 materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
 
-                accPixelValue = (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0, False),0.1))
-
-
-
-
-            # ELSE IF diffuse lambertian BRDF
-            # PUT SOME CODE HERE FOR THAT! RETURN accPixelValue
-            # Monte-Carlo BRDF
+                accPixelValue = self.traceRay(newRay, iteration+1, 1.0, False)
+                #accPixelValue = (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0, False),0.1))
+     
+            # ELSE IF diffuse lambertian
             elif firstGeometry.Material.getWall() == True:
                 rr = rand.random()
-                if rr < 0.5: # STATIC VALUE KAN ÄNDRAS TILL ANNAT VÄRDE
+                if rr < np.power(firstGeometry.Material.getReflection(), iteration):
                     intersectionPoint = ray.origin + ray.direction * tClose
-                    newRay = self.calculateDiffuseRay(intersectionPoint, firstGeometry.getNormal(intersectionPoint))
-                    accPixelValue = self.traceRay(newRay, iteration+1, importance, False)
+                    for d in range(DIFFUSE_RAY_COUNT):
+                        
+                        perfectReflection = np.subtract(ray.direction, np.multiply(np.multiply(2.0, np.dot(ray.direction, firstGeometry.getNormal(intersectionPoint))), firstGeometry.getNormal(intersectionPoint)))
+                        perfectReflection = perfectReflection / LA.norm(perfectReflection)
+                        newRay = self.calculateDiffuseRay(intersectionPoint, firstGeometry)
+                        newImportance = ((firstGeometry.Material.getSpecularPower() + 2)/(2 * DIFFUSE_RAY_COUNT)) * np.power(np.dot(perfectReflection, newRay.direction), int(firstGeometry.Material.getSpecularPower()))
+                        accPixelValue = np.add(accPixelValue, self.traceRay(newRay, iteration+1, newImportance, False))
+
+                    accPixelValue[0] /= DIFFUSE_RAY_COUNT
+                    accPixelValue[1] /= DIFFUSE_RAY_COUNT
+                    accPixelValue[2] /= DIFFUSE_RAY_COUNT
+                    accPixelValue[3] /= DIFFUSE_RAY_COUNT
+
+          
 
 
-
-
-
-
-            # Calculate shadow ray            
+            # Calculate shadow ray
+            
+            directLight = [0.0, 0.0, 0.0, 1.0]
             intersectionPoint = ray.origin + ray.direction * tClose
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                  if geometry[g].Material.getLight() == True:
-                    lightPoint = geometry[g].getRandomPoint()
-                    lightVec = lightPoint - intersectionPoint
-                    
-                    if self.calculateShadow(intersectionPoint, lightVec):
-                        return [0.0, 0.0, 0.0, 1.0]
+                    for s in range(SHADOW_RAY_COUNT):
+                        lightPoint = geometry[g].getRandomPoint()
+                        lightVec = lightPoint - intersectionPoint
+                        
+                        if self.calculateShadow(intersectionPoint, lightVec) == False:
+                            directLight += np.add(directLight, self.calculateDirectLight(intersectionPoint, firstGeometry, ray))
+                            
+
+                    directLight[0] /= SHADOW_RAY_COUNT
+                    directLight[1] /= SHADOW_RAY_COUNT
+                    directLight[2] /= SHADOW_RAY_COUNT
+                    directLight[3] /= SHADOW_RAY_COUNT
+
+                    break
 
 
 
-
-
-            directLight =  self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
-            return np.multiply(importance, (np.add(np.multiply(1.0, accPixelValue), np.multiply(1.0, directLight))))
-            #return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
+            directColor = np.multiply(firstGeometry.Material.getDiffuse(), directLight)
+            indirectColor = np.multiply((1.0 - firstGeometry.Material.getDiffuse()), np.multiply(importance, accPixelValue))
+            totalColor = np.add(indirectColor, directColor)
+            
+            #print directColor
+            #print indirectColor
+            #print totalColor
+            #print ' '
+            
+            return totalColor
 
 
 
@@ -165,8 +177,8 @@ class Tracer():
                 return (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0, False),0.1))
 
 
-        def getSpecularRay(self, ray, intersectNormal, intersectPoint):
-            direction = ray.direction
+        def getSpecularRay(self, newDirection, intersectNormal, intersectPoint):
+            direction = newDirection
             directionNorm = 1/LA.norm(direction)
             direction = np.multiply(direction, directionNorm)
             newDir = np.subtract(direction, np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal) )
@@ -206,7 +218,9 @@ class Tracer():
             return (np.multiply(materialColor, importance) + np.multiply(self.traceRay(ray, iteration+1, Irefraction, True),0.1))
 
 
-        def calculateDiffuseRay(self, intersectionPoint, pointNormal):
+        def calculateDiffuseRay(self, intersectionPoint, firstGeometry):
+
+            pointNormal = firstGeometry.getNormal(intersectionPoint)
 
             r1 = rand.random()
             r2 = rand.random()
@@ -234,6 +248,8 @@ class Tracer():
             geometry = self.Scene.sceneGeometry
             for g in range(len(geometry)):
                 if (geometry[g].Material.getLight()):
+                    ambient = 0.5
+
                     lightPoint = geometry[g].getRandomPoint()
                     lightVec =   lightPoint - intersectionPoint
 
@@ -243,27 +259,35 @@ class Tracer():
                     lightRadiance = geometry[g].Material.getRadiance()
                     lightDistance = lightDistance * lightDistance
 
+                    addOnDistanceTerm = (1/lightDistance) * lightRadiance
+
+                    if addOnDistanceTerm > 1.0:
+                        addOnDistanceTerm = 1.0
+
                     geometryObjectNormal = geometryObject.getNormal(intersectionPoint)
                     geometryObjectColor = geometryObject.Material.getColor()
                     geometryObjectDiffuse = geometryObject.Material.getDiffuse()
                     geometryObjectSpecular = geometryObject.Material.getSpecular()
                     geometryObjectSpecularPower = geometryObject.Material.getSpecularPower()
 
-                    # Diffuse Color
-                    NdotL = np.dot(geometryObjectNormal, lightVecNormalized)
-                    diffuse = np.clip(NdotL, 0, 1) * geometryObjectDiffuse
+                    if geometryObject.Material.getWall() == True:
+                        reflectance = np.dot(geometryObjectNormal, lightVecNormalized)
+                        color = (geometryObjectColor * reflectance + ambient) * lightColor * addOnDistanceTerm
+                    else:
 
-                    # Half Vector
-                    halfVector = lightVecNormalized + ray.direction
-                    halfVector = halfVector / np.linalg.norm(halfVector)
+                        # Diffuse Color
+                        NdotL = np.dot(geometryObjectNormal, lightVecNormalized)
+                        diffuse = np.clip(NdotL, 0, 1) * geometryObjectDiffuse
 
-                    # Specular Color
-                    NdotH = np.dot(geometryObjectNormal, halfVector)
-                    specular = np.power(np.clip(NdotH, 0, 1), geometryObjectSpecularPower) * geometryObjectSpecular
+                        # Half Vector
+                        halfVector = lightVecNormalized + ray.direction
+                        halfVector = halfVector / np.linalg.norm(halfVector)
 
-                    # Shade
-                    #shade = (1 / np.linalg.norm(lightVec))
-                    color = (geometryObjectColor * diffuse + specular) * lightColor
+                        # Specular Color
+                        NdotH = np.dot(geometryObjectNormal, halfVector)
+                        specular = np.power(np.clip(NdotH, 0, 1), geometryObjectSpecularPower) * geometryObjectSpecular
+
+                        color = (geometryObjectColor * diffuse + specular + ambient) * lightColor * addOnDistanceTerm
 
                     return [color[0], color[1], color[2], 1.0]
                     #return self.blinnPhong(intersectionPoint, geometryObject, ray)
