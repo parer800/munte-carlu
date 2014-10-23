@@ -3,7 +3,7 @@
 #tracer.py, Class for the actual Ray Tracer
 from OpenGL.GL.NV import half_float
 from OpenGLContext.resources import lights_vert_txt
-
+import copy
 import numpy as np
 import random as rand
 from numpy import linalg as LA
@@ -42,11 +42,11 @@ class Tracer():
             #Start recursive ray trace
             return self.traceRay(ray, 1, importance, False)
 
-        def traceRay(self, ray, iteration, importance, isInside):
+        def traceRay(self, ray, iteration, importance, isInside, depth=0):
 
 
             # IF number of iterations > Maxiterations OR importance < minimiimportance
-            if iteration > 20 or importance < 0.0001:
+            if iteration > 20:
                 return [0.0, 0.0, 0.0, 1.0]
 
 
@@ -81,36 +81,67 @@ class Tracer():
             #new ray direction & origin point
             newRay = Ray(intersectionNormal, intersectionPoint)
             accPixelValue =  [0.0, 0.0, 0.0, 1.0]
+            refractedColor = [0.0, 0.0, 0.0, 1.0]
             #Perfectly specular: use reflected ray
 
             if firstGeometry.Material.getLight() is False and firstGeometry.Material.getWall() is False:
                 #Refractive and Reflective
-
+               # print ray.direction
+                refractedRay = copy.copy(ray)
+               # print ray.direction
+                #print specularRay.direction
                 #Perfect reflection direction ()
-                ray.origin = newRay.origin - 0.01*ray.direction
-                ray.direction = self.getSpecularRay(ray, intersectionNormal, intersectionPoint)
+                EPSILON = 0.01*ray.direction
 
+                #print specularRay
 
-                refractedColor = [0.0, 0.0, 0.0, 1.0]
-
+                reflection = firstGeometry.Material.getReflection()
+                reflectionImportance = reflection
                 #TODO implement refraction
-                #if firstGeometry.Material.getTransparency() is True:
-                    #Transparent surface
-                    #print "Transparent"
-                    #refractedColor = self.getRefractedContribution(intersectionPoint, ray.direction, firstGeometry, ray, iteration, importance, isInside)
-                    #print refractedColor
+                if firstGeometry.Material.getTransparency() is True:
+                    #Transparent
+                  #  print "Transparent"
+                    refraction = firstGeometry.Material.getRefraction()
+                    refractionImportance = 1-reflectionImportance
+
+
+                    normal = firstGeometry.getNormal(intersectionPoint)
+                    if isInside is False:
+                        #outside n1 = 1.0
+                        n1 = 1.0
+                        n2 = firstGeometry.Material.getIOR()
+                        isInside = True # next recursion True
+                    else:
+                        #inside n1 = material's IOR
+                        n1 = firstGeometry.Material.getIOR()
+                        n2 = 1.0
+                        normal = -normal
+                        isInside = False # next recursion False
+                    #refractedColor = self.getRefractedContribution(intersectionPoint, refractedRay.direction, firstGeometry, refractedRay, iteration, importance, isInside)
+                    #print isInside
+                    refractedRay = self.getRefractedContribution(intersectionPoint, normal, firstGeometry, ray, n1, n2, refractionImportance, isInside, depth)
+                    #print refractedRay
+                    if refractedRay != 0.0:
+                        ray.origin = refractedRay.origin
+                        ray.direction = refractedRay.direction
+                        refractedColor = self.traceRay(ray, iteration+1, refractionImportance, isInside, depth+1)
+
+                #print refractedColor
 
 
                 # Not used yet, but wil affect the importnace
-                refraction = firstGeometry.Material.getRefraction()
-                reflection = firstGeometry.Material.getReflection()
+
 
 
                 #material color for the specular object
                 materialColor = firstGeometry.Material.getColor()
                 materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
+               # print ray.direction
 
-                accPixelValue =  (np.multiply(materialColor, 0.9) + np.multiply(self.traceRay(ray, iteration+1, 1.0, False),0.1))
+                ray.origin = newRay.origin - EPSILON
+                ray.direction = self.getSpecularRay(ray.direction, intersectionNormal, intersectionPoint)
+                accPixelValue =  (self.traceRay(ray, iteration+1, reflectionImportance, False, depth+1) + np.array(refractedColor))
+
 
 
             # ELSE IF diffuse lambertian BRDF
@@ -142,7 +173,8 @@ class Tracer():
             directLight =  self.calculateDirectLight(intersectionPoint, firstGeometry, ray)
             # Return value
 
-            return (np.add(accPixelValue, directLight))
+            #return (np.add(accPixelValue, directLight, refractedColor))
+            return np.array(directLight) + np.multiply(accPixelValue, importance)
             #return (accPixelValue + objectColor + lambert * lambert * shade * phong * diffuse * lightColor)
 
         def getSpecularContribution(self, ray, object, iteration, importance):
@@ -155,7 +187,7 @@ class Tracer():
 
 
         def getSpecularRay(self, ray, intersectNormal, intersectPoint):
-            direction = ray.direction
+            direction = ray.copy()
             directionNorm = 1/LA.norm(direction)
             direction = np.multiply(direction, directionNorm)
             newDir = np.subtract(direction, np.multiply(np.multiply(2.0, np.dot(direction, intersectNormal)), intersectNormal) )
@@ -164,10 +196,28 @@ class Tracer():
             return newDir
 
 
-        def getRefractedContribution(self, intersectionPoint, reflectedRay, geometryObject, ray, iteration, importance, isInside):
+        def getRefractedContribution(self, intersectionPoint, normal, geometryObject, ray, n1, n2, importance, isInside, depth):
             Irefraction = 1 - importance
-            normal = geometryObject.getNormal(intersectionPoint)
-            if isInside is False:
+
+
+            eta = n1 / n2
+            c1 = np.dot(ray.direction, normal) # cos(theta1)
+            cs2 = 1 - eta*eta * (1 - c1*c1)     # cos^2(theta2)
+            #print cs2
+            if cs2 < 0.0 or depth > 10:                       # total internal reflection
+                return 0.0
+
+            #newdirection = eta * ray.direction + (eta*c1-np.sqrt(cs2)* normal)
+            component = -eta * c1 - (np.sqrt(1 - ((eta*eta) * (1 - (c1*c1)))))
+            newdirection = eta * ray.direction + normal * component
+            #materialColor = geometryObject.Material.getColor()
+            #materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
+            newRay = Ray(newdirection, [0.0, 0.0, 0.0]) # numpy copy
+            newRay.origin = ray.origin + 0.001*ray.direction
+            return newRay
+            #return (self.traceRay(newRay, iteration+1, Irefraction, True))
+
+            '''if isInside is False:
                 #outside n1 = 1.0
                 n1 = 1.0
                 n2 = geometryObject.Material.getIOR()
@@ -175,11 +225,12 @@ class Tracer():
                 #inside n1 = material's IOR
                 n1 = geometryObject.Material.getIOR()
                 n2 = 1.0
-                normal = -normal
+                normal = -normal'''
 
 
 
-            NdotI = np.dot(normal, ray.direction)
+            '''NdotI = np.dot(normal, ray.direction)
+            #print NdotI
           # print (1-((n1/n2)**2) * ((1 - NdotI)**2))
             component = -(n1/n2) * NdotI - (np.sqrt(1 - (((n1/n2)**2) * (1 - (NdotI)**2))))
             direction = (n1/n2) * reflectedRay + normal * component
@@ -188,11 +239,9 @@ class Tracer():
             #Color of
             materialColor = geometryObject.Material.getColor()
             materialColor = [materialColor[0], materialColor[1], materialColor[2], 1.0]
-            newRay = ray
-            newRay.direction = direction
-            ray.origin = ray.origin + 0.0001*ray.direction
-            ray.direction = direction
-            return (np.multiply(materialColor, importance) + np.multiply(self.traceRay(ray, iteration+1, Irefraction, True),0.1))
+            newRay = Ray(ray.direction.copy(), [0.0, 0.0, 0.0]) # numpy copy
+            newRay.origin = ray.origin.copy() + 0.001*ray.direction.copy()
+            return (np.multiply(materialColor, importance) + np.multiply(self.traceRay(newRay, iteration+1, Irefraction, True),0.1))'''
 
 
         def calculateDiffuseRay(rayDirection, pointNormal):

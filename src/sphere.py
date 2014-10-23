@@ -110,7 +110,6 @@ class Sphere(Geometry):
                 t = t1
             else:
                 t = t0
-
             return t
 
 '''

@@ -210,9 +210,9 @@ class Scene():
         self.sceneGeometry.append(planeDown)
         self.sceneGeometry.append(areaLightSource)
         self.sceneGeometry.append(sphereTest)
-'''
-        self.sceneGeometry.append(sphere1)
 
+        self.sceneGeometry.append(sphere1)
+'''
         self.sceneGeometry.append(sphere2)
         self.sceneGeometry.append(boxFaceUp)
         self.sceneGeometry.append(boxFaceDown)
