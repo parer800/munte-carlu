@@ -46,6 +46,13 @@ class Plane(Geometry):
     def getNormal(self, surfacePoint):
     	return self.normal
 
+    def getCenter(self):
+        vec1 = self.pointNorthWest - self.pointSouthWest
+        vec2 = self.pointSouthEast - self.pointSouthWest
+        vec1 = vec1/2.0
+        vec2 = vec2/2.0
+        return np.add(self.pointSouthWest, np.add(vec1, vec2))
+
     def getRandomPoint(self):
         vec1 = self.pointNorthWest - self.pointSouthWest
         vec2 = self.pointSouthEast - self.pointSouthWest

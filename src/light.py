@@ -18,7 +18,7 @@ class Light(Material):
 		#super(Light, self).setSpecular()
 		#super(Light, self).setSpecularPower()
 		#super(Light, self).setIOR()
-		super(Light, self).setRadiance(4000)
+		super(Light, self).setRadiance(10000)
 		super(Light, self).setLight(True)
 		super(Light, self).setWall(False)
 		super(Light, self).setTransparency(False)
