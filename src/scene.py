@@ -61,10 +61,10 @@ class Scene():
         materialWallRight.setColor(0.0, 0.6, 0.0)
 
         materialBox = Opaque()
-        materialBox.setColor(0.5, 0.5, 0.5)
+        materialBox.setColor(0.0, 0.0, 0.9)
 
         materialGlassSphere = Transparent()
-        materialGlassSphere.setColor(0.2, 0.2, 0.8)
+        materialGlassSphere.setColor(0.58, 0.67, 0.73)
         materialGlassSphere.setIOR(1.5)
 
         materialPlasticSphere = Opaque()
@@ -133,7 +133,7 @@ class Scene():
         sphereTest = Sphere(materialPlasticSphere)
         sphereTest.setName("TestSphere")
         sphereTest.setRadius(15.0)
-        sphereTest.setCenterPoint(np.array([50.0, 40.0, 30.0]))
+        sphereTest.setCenterPoint(np.array([50.0, 40.0, 50.0]))
 
         # Sphere Front Transparent
         sphere1 = Sphere(materialGlassSphere)
