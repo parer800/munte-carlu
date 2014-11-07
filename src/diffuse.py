@@ -12,7 +12,7 @@ class Diffuse(Material):
 	def __init__(self):
 		super(Diffuse, self).__init__()
 		super(Diffuse, self).setColor(1.0, 0.0, 0.0)
-		super(Diffuse, self).setReflection(0.5)
+		super(Diffuse, self).setReflection(0.7)#0.5
 		super(Diffuse, self).setRefraction(0.0)
 		super(Diffuse, self).setDiffuse(0.5) #0.7
 		super(Diffuse, self).setSpecular(0.0225)

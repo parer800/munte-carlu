@@ -64,8 +64,7 @@ class Scene():
         materialBox.setColor(0.0, 0.0, 0.9)
 
         materialGlassSphere = Transparent()
-        materialGlassSphere.setColor(0.58, 0.67, 0.73)
-        materialGlassSphere.setIOR(1.5)
+        materialGlassSphere.setColor(0.78, 0.87, 0.93)
 
         materialPlasticSphere = Opaque()
         materialPlasticSphere.setColor(1.0, 1.0, 1.0)
@@ -87,8 +86,8 @@ class Scene():
         # Wall Left
         planeLeft = Plane(materialWallLeft)
         planeLeft.setName("WallLeft")
-        planeLeft.setPointSouthWest(0.0, 0.0, 120.0)
-        planeLeft.setPointNorthWest(0.0, 100.0, 120.0)
+        planeLeft.setPointSouthWest(0.0, 0.0, 220.0)
+        planeLeft.setPointNorthWest(0.0, 100.0, 220.0)
         planeLeft.setPointNorthEast(0.0, 100.0, 0.0)
         planeLeft.setPointSouthEast(0.0, 0.0, 0.0)
         planeLeft.setNormal(1.0, 0.0, 0.0)
@@ -98,15 +97,15 @@ class Scene():
         planeRight.setName("WallRight")
         planeRight.setPointSouthWest(150.0, 0.0, 0.0)
         planeRight.setPointNorthWest(150.0, 100.0, 0.0)
-        planeRight.setPointNorthEast(150.0, 100.0, 120.0)
-        planeRight.setPointSouthEast(150.0, 0.0, 120.0)
+        planeRight.setPointNorthEast(150.0, 100.0, 220.0)
+        planeRight.setPointSouthEast(150.0, 0.0, 220.0)
         planeRight.setNormal(-1.0, 0.0, 0.0)
 
         # Roof
         planeUp = Plane(materialRoof)
         planeUp.setName("Roof")
-        planeUp.setPointSouthWest(0.0, 100.0, 120.0)
-        planeUp.setPointNorthWest(150.0, 100.0, 120.0)
+        planeUp.setPointSouthWest(0.0, 100.0, 220.0)
+        planeUp.setPointNorthWest(150.0, 100.0, 220.0)
         planeUp.setPointNorthEast(150.0, 100.0, 0.0)
         planeUp.setPointSouthEast(0.0, 100.0, 0.0)
         planeUp.setNormal(0.0, -1.0, 0.0)
@@ -116,8 +115,8 @@ class Scene():
         planeDown.setName("Floor")
         planeDown.setPointSouthWest(0.0, 0.0, 0.0)
         planeDown.setPointNorthWest(150.0, 0.0, 0.0)
-        planeDown.setPointNorthEast(150.0, 0.0, 120.0)
-        planeDown.setPointSouthEast(0.0, 0.0, 120.0)
+        planeDown.setPointNorthEast(150.0, 0.0, 220.0)
+        planeDown.setPointSouthEast(0.0, 0.0, 220.0)
         planeDown.setNormal(0.0, 1.0, 0.0)
 
         # Light Source
@@ -130,22 +129,22 @@ class Scene():
         areaLightSource.setNormal(0.0, -1.0, 0.0)
 
         # Sphere Front Transparent
-        sphereTest = Sphere(materialPlasticSphere)
-        sphereTest.setName("TestSphere")
-        sphereTest.setRadius(15.0)
-        sphereTest.setCenterPoint(np.array([50.0, 40.0, 30.0]))
+        #sphereTest = Sphere(materialPlasticSphere)
+        #sphereTest.setName("TestSphere")
+        #sphereTest.setRadius(15.0)
+        #sphereTest.setCenterPoint(np.array([50.0, 40.0, 30.0]))
 
         # Sphere Front Transparent
         sphere1 = Sphere(materialGlassSphere)
         sphere1.setName("GlassSphere")
         sphere1.setRadius(15.0)
-        sphere1.setCenterPoint(np.array([100.0, 20.0, 80.0]))
+        sphere1.setCenterPoint(np.array([120.0, 20.0, 80.0]))
 
         # Sphere Back Opaque
         sphere2 = Sphere(materialPlasticSphere)
         sphere2.setName("PlasticSphere")
         sphere2.setRadius(20.0)
-        sphere2.setCenterPoint(np.array([120.0, 40.0, 30.0]))
+        sphere2.setCenterPoint(np.array([90.0, 40.0, 30.0]))
 
         # Box Face Up
         boxFaceUp = Plane(materialBox)
@@ -209,10 +208,9 @@ class Scene():
         self.sceneGeometry.append(planeUp)
         self.sceneGeometry.append(planeDown)
         self.sceneGeometry.append(areaLightSource)
-        self.sceneGeometry.append(sphereTest)
-'''
-        self.sceneGeometry.append(sphere1)
+        #self.sceneGeometry.append(sphereTest)
 
+        self.sceneGeometry.append(sphere1)
         self.sceneGeometry.append(sphere2)
         self.sceneGeometry.append(boxFaceUp)
         self.sceneGeometry.append(boxFaceDown)
@@ -220,7 +218,7 @@ class Scene():
         self.sceneGeometry.append(boxFaceLeft)
         self.sceneGeometry.append(boxFaceBack)
         self.sceneGeometry.append(boxFaceFront)
-        '''
+        
 
 		
 

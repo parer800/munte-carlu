@@ -14,7 +14,7 @@ class Opaque(Material):
 		super(Opaque, self).setColor(0.58, 0.67, 0.77)
 		super(Opaque, self).setReflection(0.9)
 		super(Opaque, self).setRefraction(0.0)
-		super(Opaque, self).setDiffuse(0.7)
+		super(Opaque, self).setDiffuse(0.5)#0.7
 		super(Opaque, self).setSpecular(1.0)
 		super(Opaque, self).setSpecularPower(10.0)
 		#super(Opaque, self).setIOR()
