@@ -15,14 +15,6 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from tracer import *
 
-# parallelize function
-def product(a,b):
-    print a*b
- 
-# auxiliary funciton to make it work
-def product_helper(args):
-    return product(*args)
-
 class Render():
 
     # Constructor Renderer
@@ -41,7 +33,7 @@ class Render():
         height = self.height
         width = self.width
         createPixel = self.createPixel
-        SAMPLE_COUNT = 1
+        SAMPLE_COUNT = 4
 
         # Creating image to store values in
         imgPixels_Shared = manager.list([0] * (self.height * self.width))
@@ -149,7 +141,7 @@ class Render():
         end = time.time()
 
         timer = str(datetime.timedelta(seconds=(end - start)))
-        timer = timer[0:7]
+        #timer = timer[0:7]
         timer_string = str(timer).replace(":", "_")
 
         print ' '

@@ -5,5 +5,8 @@ PyOpenGL==3.1.0
 PyOpenGL-accelerate==3.1.0
 PyVRML97==2.3.0a4
 SimpleParse==2.1.1
+dill==0.2.1
+## FIXME: could not find svn URL in dependency_links for this package:
+joblib==0.8.3-r1
 numpy==1.9.0
 wsgiref==0.1.2
